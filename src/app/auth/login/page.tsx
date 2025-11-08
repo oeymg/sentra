@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Mail, Lock } from 'lucide-react'
@@ -9,6 +9,14 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
 export default function Login() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginContent />
+    </Suspense>
+  )
+}
+
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
@@ -132,5 +140,13 @@ export default function Login() {
 
       <Footer />
     </main>
+  )
+}
+
+function LoginFallback() {
+  return (
+    <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center">
+      <p className="text-lg font-light animate-pulse">Loading login...</p>
+    </div>
   )
 }
