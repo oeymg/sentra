@@ -3,6 +3,8 @@ import { Redis } from '@upstash/redis'
 import { env } from '@/lib/env'
 import { NextRequest } from 'next/server'
 
+type RateLimiter = Pick<Ratelimit, 'limit'>
+
 /**
  * Rate limiter instances for different API endpoints
  * Uses Upstash Redis for distributed rate limiting
@@ -13,10 +15,22 @@ import { NextRequest } from 'next/server'
 
 let redis: Redis | undefined
 let rateLimiters: {
-  api: Ratelimit
-  aiAnalysis: Ratelimit
-  sync: Ratelimit
+  api: RateLimiter
+  aiAnalysis: RateLimiter
+  sync: RateLimiter
 }
+
+const createNoopLimiter = (): RateLimiter => ({
+  async limit() {
+    return {
+      success: true,
+      limit: Number.MAX_SAFE_INTEGER,
+      remaining: Number.MAX_SAFE_INTEGER,
+      reset: Date.now() + 1000,
+      pending: Promise.resolve(),
+    }
+  },
+})
 
 // Initialize rate limiters
 if (env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN) {
@@ -54,35 +68,16 @@ if (env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN) {
 
   console.log('✓ Rate limiting enabled with Upstash Redis')
 } else {
-  // Development: Use in-memory rate limiting
+  // Development: No rate limiting, log reminder for production setup
   console.warn(
-    '⚠️  Upstash Redis not configured. Using in-memory rate limiting (single-instance only).\n' +
+    '⚠️  Upstash Redis not configured. Rate limiting disabled.\n' +
       '   Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN for production.'
   )
 
-  // Create a simple in-memory cache
-  const cache = new Map()
-  const fakeRedis = {
-    sadd: async () => 1,
-    eval: async () => [1, new Date().getTime() + 60000],
-    get: async (key: string) => cache.get(key) || null,
-    set: async (key: string, value: any) => cache.set(key, value),
-    expire: async () => 1,
-  } as any
-
   rateLimiters = {
-    api: new Ratelimit({
-      redis: fakeRedis,
-      limiter: Ratelimit.slidingWindow(60, '1 m'),
-    }),
-    aiAnalysis: new Ratelimit({
-      redis: fakeRedis,
-      limiter: Ratelimit.slidingWindow(20, '1 m'),
-    }),
-    sync: new Ratelimit({
-      redis: fakeRedis,
-      limiter: Ratelimit.slidingWindow(10, '5 m'),
-    }),
+    api: createNoopLimiter(),
+    aiAnalysis: createNoopLimiter(),
+    sync: createNoopLimiter(),
   }
 }
 
