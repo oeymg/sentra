@@ -1,6 +1,33 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
+const SUPABASE_COOKIE_PREFIX = (() => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (!supabaseUrl) return null
+  try {
+    const projectRef = new URL(supabaseUrl).hostname.split('.')[0]
+    return `sb-${projectRef}-auth-token`
+  } catch {
+    return null
+  }
+})()
+
+function hasSupabaseSession(request: NextRequest) {
+  const cookies = request.cookies.getAll()
+
+  // Legacy cookie names used by some Supabase helpers
+  const legacySession = cookies.some((cookie) =>
+    cookie.name === 'sb-access-token' || cookie.name === 'sb-refresh-token'
+  )
+  if (legacySession) return true
+
+  if (!SUPABASE_COOKIE_PREFIX) return false
+
+  return cookies.some((cookie) =>
+    cookie.name === SUPABASE_COOKIE_PREFIX || cookie.name.startsWith(`${SUPABASE_COOKIE_PREFIX}.`)
+  )
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -36,19 +63,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // For dashboard routes, redirect to login if not authenticated
-  if (pathname.startsWith('/dashboard')) {
-    const supabase = supabaseResponse.cookies
-
-    // Simple check: if there's no session cookie, redirect to login
-    // More robust authentication is handled by Supabase RLS and route handlers
-    const hasSessionCookie = request.cookies.has('sb-access-token') ||
-                              request.cookies.has('sb-refresh-token')
-
-    if (!hasSessionCookie) {
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(loginUrl)
-    }
+  if (pathname.startsWith('/dashboard') && !hasSupabaseSession(request)) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
   return supabaseResponse
