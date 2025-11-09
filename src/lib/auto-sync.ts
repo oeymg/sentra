@@ -107,9 +107,10 @@ export async function autoSyncBusiness(
 
         const data = await response.json()
         syncStatus.status = 'success'
-        syncStatus.reviewCount = data.reviewCount || data.reviews?.length || 0
-        syncStatus.message = `Synced ${syncStatus.reviewCount} review(s) from ${platformName}`
-        result.totalReviews += syncStatus.reviewCount
+        const reviewCount = data.reviewCount || data.reviews?.length || 0
+        syncStatus.reviewCount = reviewCount
+        syncStatus.message = `Synced ${reviewCount} review(s) from ${platformName}`
+        result.totalReviews += reviewCount
 
         console.log(`[AutoSync] ${platformName}: ${syncStatus.reviewCount} reviews synced`)
         onProgress?.(syncStatus)
