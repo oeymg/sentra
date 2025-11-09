@@ -99,11 +99,32 @@ export async function POST(request: NextRequest) {
 
     const { error: upsertError } = await supabase
       .from('reviews')
-      .upsert(rows, { onConflict: 'platform_id,platform_review_id' })
+      .upsert(rows, {
+        onConflict: 'platform_id,platform_review_id',
+        ignoreDuplicates: false,
+      })
+      .select('id')
 
     if (upsertError) {
-      console.error('Failed to upsert Reddit reviews', upsertError)
-      return NextResponse.json({ error: 'Failed to save reviews.' }, { status: 500 })
+      console.error('[Sync] Failed to upsert Reddit reviews - RLS policy violation or database error:', {
+        code: upsertError.code,
+        message: upsertError.message,
+        details: upsertError.details,
+        hint: upsertError.hint,
+      })
+
+      // Provide helpful error message
+      if (upsertError.code === '42501') {
+        return NextResponse.json({
+          error: 'Database permission error. Please run the RLS policy fix: See FIX_RLS_POLICIES.sql',
+          details: 'Row Level Security (RLS) is blocking review inserts. Update your Supabase RLS policies.'
+        }, { status: 500 })
+      }
+
+      return NextResponse.json({
+        error: 'Failed to save reviews.',
+        details: upsertError.message
+      }, { status: 500 })
     }
 
     // Auto-analyze reviews with Claude AI (in background)

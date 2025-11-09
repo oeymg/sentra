@@ -12,7 +12,8 @@
       "Bash(wc:*)",
       "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []

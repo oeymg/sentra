@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { fetchAllGoogleReviews, normalizeGoogleReview } from '@/lib/integrations/google-reviews'
 import { batchAnalyzeReviews } from '@/lib/ai/claude'
 import { googleReviewsSyncSchema, validateRequestBody } from '@/lib/validations/api'
@@ -103,14 +103,32 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    const { error: upsertError } = await supabase
+    // Use service role client to bypass RLS for syncing reviews (trusted server-side operation)
+    console.log('[Sync] Upserting reviews with service role client...')
+    const serviceClient = createServiceRoleClient()
+    const { error: upsertError, data: upsertedData } = await serviceClient
       .from('reviews')
-      .upsert(rows, { onConflict: 'platform_id,platform_review_id' })
+      .upsert(rows, {
+        onConflict: 'platform_id,platform_review_id',
+        ignoreDuplicates: false,
+      })
+      .select('id')
 
     if (upsertError) {
-      console.error('Failed to upsert reviews', upsertError)
-      return NextResponse.json({ error: 'Failed to save reviews.' }, { status: 500 })
+      console.error('[Sync] Failed to upsert reviews:', {
+        code: upsertError.code,
+        message: upsertError.message,
+        details: upsertError.details,
+        hint: upsertError.hint,
+      })
+
+      return NextResponse.json({
+        error: 'Failed to save reviews.',
+        details: upsertError.message
+      }, { status: 500 })
     }
+
+    console.log(`[Sync] Successfully upserted ${rows.length} reviews`)
 
     // Auto-analyze reviews with Claude AI (in background)
     try {
@@ -119,14 +137,15 @@ export async function POST(request: NextRequest) {
       // Use the review text and rating from the rows we already normalized
       const reviewsToAnalyze = rows.map(row => ({
         text: row.review_text || '',
-        rating: row.rating || 0
+        rating: row.rating || 0,
+        existingResponse: row.response_text
       }))
 
       console.log('[Claude AI] Calling batchAnalyzeReviews...')
       const analyses = await batchAnalyzeReviews(reviewsToAnalyze)
       console.log(`[Claude AI] Received ${analyses.length} analyses`)
 
-      // Update reviews with AI analysis in parallel (batch)
+      // Update reviews with AI analysis in parallel (batch) - use service role client
       const updatePromises = rows.map(async (row, i) => {
         const analysis = analyses[i]
         if (!analysis) return
@@ -135,18 +154,30 @@ export async function POST(request: NextRequest) {
           sentiment: analysis.sentiment,
           keywords: analysis.keywords?.length || 0,
           categories: analysis.categories?.length || 0,
+          aiDetectedResponse: analysis.hasBusinessResponse,
         })
 
-        const { error: updateError } = await supabase
+        // Prepare update data
+        const updateData: any = {
+          sentiment: analysis.sentiment,
+          sentiment_score: analysis.sentimentScore,
+          keywords: analysis.keywords,
+          categories: analysis.categories,
+          language: analysis.language,
+          is_spam: analysis.isSpam,
+        }
+
+        // If AI detected a response and the review doesn't have one yet, update it
+        if (analysis.hasBusinessResponse && !row.has_response && analysis.businessResponseText) {
+          console.log(`[Claude AI] AI detected business response in review ${i + 1}`)
+          updateData.has_response = true
+          updateData.response_text = analysis.businessResponseText
+          updateData.responded_at = new Date().toISOString()
+        }
+
+        const { error: updateError } = await serviceClient
           .from('reviews')
-          .update({
-            sentiment: analysis.sentiment,
-            sentiment_score: analysis.sentimentScore,
-            keywords: analysis.keywords,
-            categories: analysis.categories,
-            language: analysis.language,
-            is_spam: analysis.isSpam,
-          })
+          .update(updateData)
           .eq('platform_id', row.platform_id)
           .eq('platform_review_id', row.platform_review_id)
 

@@ -175,10 +175,12 @@ function transformGoogleReview(review: any): GoogleReview {
 }
 
 function getRatingEnum(rating: number): 'ONE' | 'TWO' | 'THREE' | 'FOUR' | 'FIVE' {
-  if (rating <= 1) return 'ONE'
-  if (rating <= 2) return 'TWO'
-  if (rating <= 3) return 'THREE'
-  if (rating <= 4) return 'FOUR'
+  // Round to nearest integer for accurate rating conversion
+  const rounded = Math.round(rating)
+  if (rounded <= 1) return 'ONE'
+  if (rounded === 2) return 'TWO'
+  if (rounded === 3) return 'THREE'
+  if (rounded === 4) return 'FOUR'
   return 'FIVE'
 }
 

@@ -98,6 +98,8 @@ export default function ReviewsPage() {
   useEffect(() => {
     const loadReviews = async () => {
       if (!selectedBusiness) return
+      // Clear reviews immediately when switching businesses
+      setReviews([])
       setLoadingReviews(true)
       setError(null)
 
@@ -119,6 +121,7 @@ export default function ReviewsPage() {
           )
           .eq('business_id', selectedBusiness)
           .order('reviewed_at', { ascending: false })
+          .limit(5)
 
         if (error) throw error
 
@@ -378,7 +381,7 @@ export default function ReviewsPage() {
               <p className="text-sm text-gray-600 mb-6">Connect a platform or import reviews to populate this view.</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4" key={selectedBusiness}>
               {filteredReviews.map((review, idx) => (
                 <motion.div
                   key={review.id}

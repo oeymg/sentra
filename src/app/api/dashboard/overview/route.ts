@@ -129,10 +129,13 @@ export async function GET(request: NextRequest) {
 
     const businessIds = businesses.map((biz) => biz.id)
 
+    // Only fetch the 5 most recent reviews for quick stats
     const { data: reviews, error: reviewsError } = await supabase
       .from('reviews')
       .select('id,business_id,platform_id,rating,sentiment,reviewed_at,has_response,responded_at,categories,sentiment_score')
       .in('business_id', businessIds)
+      .order('reviewed_at', { ascending: false })
+      .limit(5)
 
     if (reviewsError) {
       console.error('Failed to load reviews', reviewsError)

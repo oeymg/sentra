@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
+import SyncToast from '@/components/SyncToast'
 import { createClient } from '@/lib/supabase/client'
+import { smartAutoSync, type SyncStatus } from '@/lib/auto-sync'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, Link2, PlugZap, Shield, X } from 'lucide-react'
 
@@ -26,6 +28,8 @@ export default function PlatformsPage() {
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [syncStatuses, setSyncStatuses] = useState<SyncStatus[]>([])
+  const [showSyncToast, setShowSyncToast] = useState(false)
 
   useEffect(() => {
     const loadPrerequisites = async () => {
@@ -170,6 +174,29 @@ export default function PlatformsPage() {
           }
         })
       )
+
+      // Auto-sync reviews after connecting platform
+      console.log('[Platforms] Triggering auto-sync for newly connected platform')
+      setSyncStatuses([])
+      setShowSyncToast(true)
+
+      smartAutoSync(selectedBusiness, true, (status) => {
+        setSyncStatuses((prev) => {
+          const existing = prev.find((s) => s.platform === status.platform)
+          if (existing) {
+            return prev.map((s) => (s.platform === status.platform ? status : s))
+          }
+          return [...prev, status]
+        })
+      }).then((result) => {
+        if (result) {
+          console.log('[Platforms] Auto-sync complete:', result.totalReviews, 'reviews synced')
+          // Auto-hide toast after 5 seconds
+          setTimeout(() => {
+            setShowSyncToast(false)
+          }, 5000)
+        }
+      })
     } catch (err) {
       console.error(err)
       setError(err instanceof Error ? err.message : 'Unable to connect platform.')
@@ -406,6 +433,13 @@ export default function PlatformsPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Sync Status Toast */}
+      <SyncToast
+        syncs={syncStatuses}
+        isVisible={showSyncToast}
+        onClose={() => setShowSyncToast(false)}
+      />
     </DashboardLayout>
   )
 }

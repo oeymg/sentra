@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
+import InsightsCard from '@/components/dashboard/InsightsCard'
+import SyncToast from '@/components/SyncToast'
 import { createClient } from '@/lib/supabase/client'
+import { smartAutoSync, type SyncStatus } from '@/lib/auto-sync'
 import {
   Area,
   AreaChart,
@@ -51,6 +54,10 @@ export default function Dashboard() {
   const [overview, setOverview] = useState<OverviewResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [businessId, setBusinessId] = useState<string | null>(null)
+  const [syncStatuses, setSyncStatuses] = useState<SyncStatus[]>([])
+  const [showSyncToast, setShowSyncToast] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
@@ -72,6 +79,7 @@ export default function Dashboard() {
           .order('created_at', { ascending: true })
 
         const firstBusinessId = businesses?.[0]?.id ?? null
+        setBusinessId(firstBusinessId)
 
         const endpoint = firstBusinessId
           ? `/api/dashboard/overview?businessId=${firstBusinessId}`
@@ -89,6 +97,41 @@ export default function Dashboard() {
         }
 
         setOverview(payload)
+
+        // Auto-sync reviews if business has connected platforms
+        if (firstBusinessId && payload.stats.connectedPlatforms > 0) {
+          console.log('[Dashboard] Triggering smart auto-sync')
+          setSyncStatuses([])
+          setShowSyncToast(true)
+
+          smartAutoSync(firstBusinessId, false, (status) => {
+            setSyncStatuses((prev) => {
+              const existing = prev.find((s) => s.platform === status.platform)
+              if (existing) {
+                return prev.map((s) => (s.platform === status.platform ? status : s))
+              }
+              return [...prev, status]
+            })
+          }).then((result) => {
+            if (result) {
+              console.log('[Dashboard] Auto-sync complete:', result.totalReviews, 'reviews synced')
+              // Reload dashboard data if reviews were synced
+              if (result.totalReviews > 0) {
+                fetch(endpoint)
+                  .then((res) => res.json())
+                  .then((data) => setOverview(data))
+                  .catch(console.error)
+              }
+              // Auto-hide toast after 5 seconds
+              setTimeout(() => {
+                setShowSyncToast(false)
+              }, 5000)
+            } else {
+              // No sync needed (synced recently)
+              setShowSyncToast(false)
+            }
+          })
+        }
       } catch (err) {
         console.error(err)
         setError(err instanceof Error ? err.message : 'Failed to load dashboard data')
@@ -99,6 +142,24 @@ export default function Dashboard() {
 
     loadData()
   }, [router])
+
+  const handleRefresh = async () => {
+    if (!businessId || refreshing) return
+
+    setRefreshing(true)
+    try {
+      const endpoint = `/api/dashboard/overview?businessId=${businessId}`
+      const response = await fetch(endpoint)
+      if (response.ok) {
+        const payload = await response.json()
+        setOverview(payload)
+      }
+    } catch (err) {
+      console.error('Failed to refresh:', err)
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -184,40 +245,79 @@ export default function Dashboard() {
     <DashboardLayout>
       <div className="p-12">
         <div className="max-w-7xl mx-auto space-y-12">
-          <div>
-            <motion.h1
-              className="text-5xl font-light mb-3 bg-gradient-to-r from-black to-gray-700 bg-clip-text text-transparent"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
+          <div className="flex items-start justify-between">
+            <div>
+              <motion.h1
+                className="text-5xl font-light mb-3 bg-gradient-to-r from-black to-gray-700 bg-clip-text text-transparent"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                Dashboard
+              </motion.h1>
+              <p className="text-lg text-gray-600 font-light">
+                Live snapshot of your review operations
+                {overview.stats.totalReviews > 0 && (
+                  <span className="ml-2 text-sm text-gray-500">
+                    • Based on {Math.min(overview.stats.totalReviews, 5)} most recent reviews
+                  </span>
+                )}
+              </p>
+            </div>
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
             >
-              Dashboard
-            </motion.h1>
-            <p className="text-lg text-gray-600 font-light">Live snapshot of your review operations</p>
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Refreshing...' : 'Refresh Stats'}
+            </button>
           </div>
 
           <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
             {statsCards.map((stat, idx) => {
               const Icon = stat.icon
+              const gradients = [
+                'from-blue-500 to-cyan-500',
+                'from-purple-500 to-pink-500',
+                'from-orange-500 to-red-500',
+                'from-green-500 to-emerald-500'
+              ]
               return (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300"
+                  className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
                 >
-                  <div className="flex items-center justify-between mb-6">
-                    <p className="text-xs uppercase tracking-widest text-gray-500">{stat.label}</p>
-                    <span className="p-2 rounded-xl bg-gray-900 text-white">
-                      <Icon className="w-4 h-4" />
-                    </span>
+                  {/* Gradient Background on Hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${gradients[idx]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-6">
+                      <p className="text-xs uppercase tracking-widest text-gray-500 font-semibold">{stat.label}</p>
+                      <span className={`p-3 rounded-xl bg-gradient-to-br ${gradients[idx]} text-white shadow-md`}>
+                        <Icon className="w-5 h-5" />
+                      </span>
+                    </div>
+                    <div className="text-5xl font-light text-black mb-2">{stat.value}</div>
+                    <p className="text-sm text-gray-600">{stat.helper}</p>
                   </div>
-                  <div className="text-4xl font-light text-black mb-2">{stat.value}</div>
-                  <p className="text-xs text-gray-500">{stat.helper}</p>
                 </motion.div>
               )
             })}
           </div>
+
+          {/* AI-Powered Insights */}
+          {overview.stats.totalReviews > 0 && businessId && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <InsightsCard businessId={businessId} />
+            </motion.div>
+          )}
 
           <div className="grid xl:grid-cols-[2fr,1fr] gap-6">
             <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
@@ -394,6 +494,13 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Sync Status Toast */}
+      <SyncToast
+        syncs={syncStatuses}
+        isVisible={showSyncToast}
+        onClose={() => setShowSyncToast(false)}
+      />
     </DashboardLayout>
   )
 }
