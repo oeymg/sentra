@@ -13,13 +13,9 @@ import {
   Star,
   MessageSquare,
   Loader2,
+  ChevronDown,
 } from 'lucide-react'
-
-type Business = {
-  id: string
-  name: string
-  googlePlaceId: string | null
-}
+import { useBusinessContext } from '@/contexts/BusinessContext'
 
 type Review = {
   id: string
@@ -47,13 +43,11 @@ const PLATFORM_EMOJI: Record<string, string> = {
 
 export default function ReviewsPage() {
   const supabase = useMemo(() => createClient(), [])
+  const { businesses, selectedBusiness, setSelectedBusinessId } = useBusinessContext()
 
-  const [businesses, setBusinesses] = useState<Business[]>([])
-  const [selectedBusiness, setSelectedBusiness] = useState<string | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
   const [filter, setFilter] = useState<'all' | 'positive' | 'negative'>('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [loadingBusinesses, setLoadingBusinesses] = useState(true)
   const [loadingReviews, setLoadingReviews] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -65,45 +59,43 @@ export default function ReviewsPage() {
   const [generating, setGenerating] = useState(false)
   const [savingResponse, setSavingResponse] = useState(false)
   const [analysisStatus, setAnalysisStatus] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalReviews, setTotalReviews] = useState(0)
+  const reviewsPerPage = 25
+  const [postToPlatform, setPostToPlatform] = useState(false)
 
+  // Reset to page 1 when business changes
   useEffect(() => {
-    const loadBusinesses = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('businesses')
-          .select('id,name,google_place_id')
-          .order('created_at', { ascending: true })
-        if (error) throw error
-        const rows =
-          data?.map((biz) => ({
-            id: biz.id,
-            name: biz.name,
-            googlePlaceId: biz.google_place_id ?? null,
-          })) ?? []
-        setBusinesses(rows)
-        if (rows.length > 0) {
-          setSelectedBusiness(rows[0].id)
-        }
-      } catch (err) {
-        console.error(err)
-        setError('Unable to load your businesses. Confirm Supabase is configured correctly.')
-      } finally {
-        setLoadingBusinesses(false)
-      }
-    }
-
-    loadBusinesses()
-  }, [supabase])
+    console.log('[Reviews] Business changed, resetting state')
+    setCurrentPage(1)
+    // Clear reviews when switching businesses
+    setReviews([])
+    setTotalReviews(0)
+    setError(null)
+    setAnalysisStatus(null)
+  }, [selectedBusiness])
 
   useEffect(() => {
     const loadReviews = async () => {
       if (!selectedBusiness) return
+
+      console.log('[Reviews] Loading reviews for business:', selectedBusiness.id, selectedBusiness.name)
+
       // Clear reviews immediately when switching businesses
       setReviews([])
+      setTotalReviews(0)
       setLoadingReviews(true)
       setError(null)
 
       const fetchStoredReviews = async () => {
+        // Get total count first
+        const { count } = await supabase
+          .from('reviews')
+          .select('*', { count: 'exact', head: true })
+          .eq('business_id', selectedBusiness.id)
+
+        setTotalReviews(count || 0)
+
         const { data, error } = await supabase
           .from('reviews')
           .select(
@@ -119,9 +111,9 @@ export default function ReviewsPage() {
             review_platforms ( name, slug )
           `
           )
-          .eq('business_id', selectedBusiness)
+          .eq('business_id', selectedBusiness.id)
           .order('reviewed_at', { ascending: false })
-          .limit(5)
+          .range((currentPage - 1) * reviewsPerPage, currentPage * reviewsPerPage - 1)
 
         if (error) throw error
 
@@ -158,12 +150,11 @@ export default function ReviewsPage() {
         let { items: normalized, hasUnanalysed } = await fetchStoredReviews()
 
         if (!normalized.length) {
-          const currentBusiness = businesses.find((biz) => biz.id === selectedBusiness)
-          if (currentBusiness?.googlePlaceId) {
+          if (selectedBusiness.googlePlaceId) {
             const syncResponse = await fetch('/api/google-reviews/sync', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ businessId: currentBusiness.id }),
+              body: JSON.stringify({ businessId: selectedBusiness.id }),
             })
 
             if (syncResponse.ok) {
@@ -182,7 +173,7 @@ export default function ReviewsPage() {
           const response = await fetch('/api/reviews/analyze-missing', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ businessId: selectedBusiness }),
+            body: JSON.stringify({ businessId: selectedBusiness.id }),
           })
 
           if (response.ok) {
@@ -205,7 +196,7 @@ export default function ReviewsPage() {
     }
 
     loadReviews()
-  }, [supabase, selectedBusiness, businesses])
+  }, [supabase, selectedBusiness, currentPage, reviewsPerPage])
 
   const filteredReviews = useMemo(() => {
     const query = searchTerm.trim().toLowerCase()
@@ -268,17 +259,24 @@ export default function ReviewsPage() {
     setModalError(null)
 
     try {
-      const { error } = await supabase
-        .from('reviews')
-        .update({
-          has_response: true,
-          response_text: aiResponse.trim(),
-          responded_at: new Date().toISOString(),
-        })
-        .eq('id', selectedReview.id)
+      // Use the post-reply API endpoint which handles both dry-run and real posting
+      const response = await fetch('/api/reviews/post-reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reviewId: selectedReview.id,
+          replyText: aiResponse.trim(),
+          isDryRun: !postToPlatform, // Default to dry run for MVP trial
+        }),
+      })
 
-      if (error) throw error
+      const result = await response.json()
 
+      if (!response.ok) {
+        throw new Error(result.message || result.error || 'Failed to post response')
+      }
+
+      // Update local state
       setReviews((prev) =>
         prev.map((review) =>
           review.id === selectedReview.id
@@ -287,13 +285,22 @@ export default function ReviewsPage() {
         )
       )
 
+      // Show success message
+      if (result.isDryRun) {
+        setModalError(null)
+        alert('✅ Response saved! This is saved locally for your records. Enable platform integration to post directly.')
+      } else {
+        setModalError(null)
+        alert('✅ Response posted to platform successfully!')
+      }
+
       setShowAIModal(false)
       setSelectedReview(null)
       setAiResponse('')
       setAiSuggestions([])
     } catch (err) {
       console.error(err)
-      setModalError(err instanceof Error ? err.message : 'Failed to save response.')
+      setModalError(err instanceof Error ? err.message : 'Failed to post response.')
     } finally {
       setSavingResponse(false)
     }
@@ -303,7 +310,7 @@ export default function ReviewsPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-12">
+      <div className="p-12" key={selectedBusiness?.id || 'no-business'}>
         <div className="max-w-7xl mx-auto space-y-10">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
@@ -312,21 +319,25 @@ export default function ReviewsPage() {
               </h1>
               <p className="text-lg text-gray-600 font-light">Monitor every review and respond with AI assistance.</p>
             </div>
-            <div className="flex items-center gap-3">
-              <label className="text-sm text-gray-500">Business</label>
-              <select
-                className="px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-900"
-                value={selectedBusiness ?? ''}
-                onChange={(event) => setSelectedBusiness(event.target.value)}
-                disabled={loadingBusinesses || businesses.length === 0}
-              >
-                {businesses.map((business) => (
-                  <option key={business.id} value={business.id}>
-                    {business.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {businesses.length > 1 && (
+              <div className="flex items-center gap-3">
+                <label className="text-sm text-gray-500">Business</label>
+                <div className="relative">
+                  <select
+                    className="px-4 py-2 pr-10 border border-gray-200 rounded-lg bg-white text-gray-900 appearance-none cursor-pointer hover:border-gray-300 transition"
+                    value={selectedBusiness?.id ?? ''}
+                    onChange={(event) => setSelectedBusinessId(event.target.value)}
+                  >
+                    {businesses.map((business) => (
+                      <option key={business.id} value={business.id}>
+                        {business.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                </div>
+              </div>
+            )}
           </div>
 
           {error && (
@@ -451,6 +462,35 @@ export default function ReviewsPage() {
             </div>
           )}
 
+          {/* Pagination */}
+          {!loadingReviews && totalReviews > reviewsPerPage && (
+            <div className="flex items-center justify-between border-t border-gray-200 pt-6">
+              <p className="text-sm text-gray-600">
+                Showing {Math.min((currentPage - 1) * reviewsPerPage + 1, totalReviews)} to{' '}
+                {Math.min(currentPage * reviewsPerPage, totalReviews)} of {totalReviews} reviews
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-gray-600">
+                  Page {currentPage} of {Math.ceil(totalReviews / reviewsPerPage)}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(Math.ceil(totalReviews / reviewsPerPage), prev + 1))}
+                  disabled={currentPage >= Math.ceil(totalReviews / reviewsPerPage)}
+                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="grid lg:grid-cols-2 gap-4">
             <SuggestionCard
               title="Response templates"
@@ -532,6 +572,25 @@ export default function ReviewsPage() {
                 placeholder="Edit the AI suggestion before posting..."
               />
 
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={postToPlatform}
+                    onChange={(e) => setPostToPlatform(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 accent-black"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">Post directly to platform (requires OAuth)</p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {postToPlatform
+                        ? 'Will attempt to post to the review platform. Requires connected account.'
+                        : 'Trial mode: Response will be saved locally for your records.'}
+                    </p>
+                  </div>
+                </label>
+              </div>
+
               <div className="flex items-center justify-between mt-4">
                 <p className="text-xs text-gray-500">
                   Claude drafts are saved for auditing once you post a response.
@@ -542,7 +601,7 @@ export default function ReviewsPage() {
                   className="inline-flex items-center gap-2 px-5 py-2 bg-black text-white rounded-lg disabled:opacity-50"
                 >
                   {savingResponse && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Post response
+                  {postToPlatform ? 'Post to platform' : 'Save response'}
                 </button>
               </div>
             </motion.div>

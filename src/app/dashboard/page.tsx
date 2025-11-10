@@ -7,6 +7,7 @@ import InsightsCard from '@/components/dashboard/InsightsCard'
 import SyncToast from '@/components/SyncToast'
 import { createClient } from '@/lib/supabase/client'
 import { smartAutoSync, type SyncStatus } from '@/lib/auto-sync'
+import { useBusinessContext } from '@/contexts/BusinessContext'
 import {
   Area,
   AreaChart,
@@ -24,6 +25,9 @@ import {
   MessageSquare,
   RefreshCw,
   Star,
+  Copy,
+  Check,
+  ExternalLink,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -51,13 +55,14 @@ type OverviewResponse = {
 
 export default function Dashboard() {
   const router = useRouter()
+  const { selectedBusiness } = useBusinessContext()
   const [overview, setOverview] = useState<OverviewResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [businessId, setBusinessId] = useState<string | null>(null)
   const [syncStatuses, setSyncStatuses] = useState<SyncStatus[]>([])
   const [showSyncToast, setShowSyncToast] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
@@ -72,18 +77,18 @@ export default function Dashboard() {
           return
         }
 
-        const { data: businesses } = await supabase
-          .from('businesses')
-          .select('id')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: true })
+        if (!selectedBusiness) {
+          setLoading(false)
+          return
+        }
 
-        const firstBusinessId = businesses?.[0]?.id ?? null
-        setBusinessId(firstBusinessId)
+        console.log('[Dashboard] Loading data for business:', selectedBusiness.id, selectedBusiness.name)
 
-        const endpoint = firstBusinessId
-          ? `/api/dashboard/overview?businessId=${firstBusinessId}`
-          : '/api/dashboard/overview'
+        // Clear previous overview when switching businesses
+        setOverview(null)
+        setLoading(true)
+
+        const endpoint = `/api/dashboard/overview?businessId=${selectedBusiness.id}`
 
         const response = await fetch(endpoint)
         if (response.status === 401) {
@@ -99,12 +104,12 @@ export default function Dashboard() {
         setOverview(payload)
 
         // Auto-sync reviews if business has connected platforms
-        if (firstBusinessId && payload.stats.connectedPlatforms > 0) {
+        if (selectedBusiness && payload.stats.connectedPlatforms > 0) {
           console.log('[Dashboard] Triggering smart auto-sync')
           setSyncStatuses([])
           setShowSyncToast(true)
 
-          smartAutoSync(firstBusinessId, false, (status) => {
+          smartAutoSync(selectedBusiness.id, false, (status) => {
             setSyncStatuses((prev) => {
               const existing = prev.find((s) => s.platform === status.platform)
               if (existing) {
@@ -141,14 +146,14 @@ export default function Dashboard() {
     }
 
     loadData()
-  }, [router])
+  }, [router, selectedBusiness])
 
   const handleRefresh = async () => {
-    if (!businessId || refreshing) return
+    if (!selectedBusiness || refreshing) return
 
     setRefreshing(true)
     try {
-      const endpoint = `/api/dashboard/overview?businessId=${businessId}`
+      const endpoint = `/api/dashboard/overview?businessId=${selectedBusiness.id}`
       const response = await fetch(endpoint)
       if (response.ok) {
         const payload = await response.json()
@@ -159,6 +164,14 @@ export default function Dashboard() {
     } finally {
       setRefreshing(false)
     }
+  }
+
+  const handleCopyLink = () => {
+    if (!selectedBusiness) return
+    const url = `${window.location.origin}/reviews/${selectedBusiness.id}`
+    navigator.clipboard.writeText(url)
+    setCopiedLink(true)
+    setTimeout(() => setCopiedLink(false), 2000)
   }
 
   if (loading) {
@@ -308,14 +321,65 @@ export default function Dashboard() {
             })}
           </div>
 
+          {/* Shareable Public Reviews Link */}
+          {selectedBusiness && overview.stats.totalReviews > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ExternalLink className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-lg font-medium text-gray-900">Share your reviews with customers</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Show potential customers what people are saying about your business. This public page displays all your reviews and responses.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-white border border-blue-200 rounded-lg px-4 py-2 text-sm text-gray-700 font-mono overflow-x-auto">
+                      {typeof window !== 'undefined' && `${window.location.origin}/reviews/${selectedBusiness.id}`}
+                    </div>
+                    <button
+                      onClick={handleCopyLink}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition whitespace-nowrap"
+                    >
+                      {copiedLink ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Copy Link
+                        </>
+                      )}
+                    </button>
+                    <Link
+                      href={`/reviews/${selectedBusiness.id}`}
+                      target="_blank"
+                      className="inline-flex items-center gap-2 px-4 py-2 border border-blue-200 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition whitespace-nowrap"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Preview
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* AI-Powered Insights */}
-          {overview.stats.totalReviews > 0 && businessId && (
+          {overview.stats.totalReviews > 0 && selectedBusiness && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <InsightsCard businessId={businessId} />
+              <InsightsCard businessId={selectedBusiness.id} />
             </motion.div>
           )}
 

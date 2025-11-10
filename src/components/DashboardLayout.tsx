@@ -8,14 +8,15 @@ import { User } from '@supabase/supabase-js'
 import { LayoutDashboard, Star, Settings, Link2, LogOut, TrendingUp, Lightbulb, ChevronDown, ChevronRight, Menu, X, RefreshCw } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { BusinessInsight } from '@/lib/ai/claude'
+import { useBusinessContext } from '@/contexts/BusinessContext'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { selectedBusiness } = useBusinessContext()
   const router = useRouter()
   const pathname = usePathname()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [showGrowthTips, setShowGrowthTips] = useState(false)
-  const [primaryBusiness, setPrimaryBusiness] = useState<{ id: string; name: string; suburb: string | null } | null>(null)
   const [quickStats, setQuickStats] = useState({
     totalReviews: 0,
     avgRating: 0,
@@ -35,38 +36,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         router.push('/auth/login')
       } else {
         setUser(user)
-        await loadPrimaryBusiness(supabase, user.id)
       }
       setLoading(false)
     })
   }, [router])
 
-  const loadPrimaryBusiness = async (supabase: ReturnType<typeof createClient>, userId: string) => {
-    try {
-      const { data: businesses } = await supabase
-        .from('businesses')
-        .select('id,name,address')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: true })
-        .limit(1)
-
-      if (businesses && businesses.length > 0) {
-        const biz = businesses[0]
-        setPrimaryBusiness({
-          id: biz.id,
-          name: biz.name,
-          suburb: extractSuburb(biz.address),
-        })
-        await loadSidebarStats(biz.id)
-      } else {
-        setPrimaryBusiness(null)
-        setStatsLoading(false)
-      }
-    } catch (error) {
-      console.error('Failed to load business meta', error)
+  // Load stats when selected business changes
+  useEffect(() => {
+    if (selectedBusiness) {
+      loadSidebarStats(selectedBusiness.id)
+    } else {
       setStatsLoading(false)
+      setQuickStats({ totalReviews: 0, avgRating: 0, pendingReviews: 0 })
+      setAiInsights([])
     }
-  }
+  }, [selectedBusiness])
 
   const loadSidebarStats = async (businessId: string) => {
     try {
@@ -165,10 +149,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   const handleRefresh = async () => {
-    if (!primaryBusiness || refreshing) return
+    if (!selectedBusiness || refreshing) return
     setRefreshing(true)
     try {
-      await loadSidebarStats(primaryBusiness.id)
+      await loadSidebarStats(selectedBusiness.id)
       // Force page reload to refresh all components
       window.location.reload()
     } catch (error) {
@@ -264,8 +248,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               sentra
             </motion.div>
             <p className="text-xs text-gray-500 mt-1">
-              {primaryBusiness
-                ? `${primaryBusiness.name}${primaryBusiness.suburb ? ` • ${primaryBusiness.suburb}` : ''}`
+              {selectedBusiness
+                ? `${selectedBusiness.name}${selectedBusiness.suburb ? ` • ${selectedBusiness.suburb}` : ''}`
                 : 'Add your first business'}
             </p>
           </Link>
@@ -476,15 +460,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
     </>
   )
-}
-
-function extractSuburb(address?: string | null) {
-  if (!address) return null
-  const parts = address.split(',').map((part) => part.trim()).filter(Boolean)
-  if (parts.length >= 2) {
-    return parts[1]
-  }
-  return parts[0] ?? null
 }
 
 function LoadingSplash() {

@@ -4,14 +4,17 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { createClient } from '@/lib/supabase/client'
-import { User, Building2, Bell, Key, MessageSquare } from 'lucide-react'
+import { User, Building2, Bell, Key, MessageSquare, AlertTriangle } from 'lucide-react'
 import { responseTemplates } from '@/lib/analytics'
+import { useBusinessContext } from '@/contexts/BusinessContext'
 
 export default function Settings() {
   const router = useRouter()
+  const { selectedBusiness } = useBusinessContext()
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('profile')
   const [user, setUser] = useState<any>(null)
+  const [resetting, setResetting] = useState(false)
   const [profile, setProfile] = useState({
     fullName: '',
     email: ''
@@ -195,6 +198,59 @@ export default function Settings() {
       setPlaceLookupStatus(err instanceof Error ? err.message : 'Failed to lookup Place ID.')
     } finally {
       setPlaceLookupLoading(false)
+    }
+  }
+
+  const handleResetDashboard = async () => {
+    if (!selectedBusiness) {
+      alert('No business selected')
+      return
+    }
+
+    const confirmed = window.confirm(
+      `⚠️ WARNING: This will permanently delete ALL reviews, AI responses, and insights for "${selectedBusiness.name}".\n\nThis action CANNOT be undone.\n\nType "${selectedBusiness.name}" in the next prompt to confirm.`
+    )
+
+    if (!confirmed) return
+
+    const confirmation = window.prompt(`Type "${selectedBusiness.name}" to confirm:`)
+    if (confirmation !== selectedBusiness.name) {
+      alert('Confirmation failed. Reset cancelled.')
+      return
+    }
+
+    setResetting(true)
+
+    try {
+      const response = await fetch('/api/reviews/reset', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessId: selectedBusiness.id }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to reset reviews')
+      }
+
+      alert(`✅ Successfully deleted ${result.deletedCount} reviews and all associated data.`)
+
+      // Clear local caches
+      try {
+        localStorage.removeItem('sentra_insights_cache')
+        localStorage.removeItem('sentra_sidebar_insights_cache')
+      } catch (e) {
+        console.error('Error clearing caches:', e)
+      }
+
+      // Reload the page to refresh all data
+      window.location.reload()
+    } catch (err) {
+      console.error('Reset failed:', err)
+      alert(err instanceof Error ? err.message : 'Failed to reset dashboard')
+    } finally {
+      setResetting(false)
     }
   }
 
@@ -506,6 +562,33 @@ export default function Settings() {
                   <p className="text-sm text-gray-600 mb-4">Permanently delete your account and all data</p>
                   <button className="px-6 py-2 border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-colors">
                     Delete Account
+                  </button>
+                </div>
+
+                <div className="pt-6 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-5 h-5 text-orange-600" />
+                    <h3 className="font-light text-lg text-black">Danger Zone</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Reset all review data for {selectedBusiness?.name || 'this business'}. This will delete all reviews, AI responses, and insights. This action cannot be undone.
+                  </p>
+                  <button
+                    onClick={handleResetDashboard}
+                    disabled={resetting || !selectedBusiness}
+                    className="px-6 py-2 border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {resetting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                        Resetting...
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="w-4 h-4" />
+                        Reset All Reviews
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
