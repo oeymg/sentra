@@ -392,7 +392,7 @@ export default function ReviewsPage() {
               <p className="text-sm text-gray-600 mb-6">Connect a platform or import reviews to populate this view.</p>
             </div>
           ) : (
-            <div className="space-y-4" key={selectedBusiness}>
+            <div className="space-y-4" key={selectedBusiness?.id}>
               {filteredReviews.map((review, idx) => (
                 <motion.div
                   key={review.id}
