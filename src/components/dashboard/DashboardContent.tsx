@@ -202,14 +202,15 @@ export default function DashboardContent({ user, businesses: initialBusinesses }
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Out of 5 stars</p>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                {/* Response Rate metric - Hidden until tracking is implemented */}
+                {/* <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Response Rate</span>
                     <MessageSquare className="w-5 h-5 text-purple-600" />
                   </div>
                   <p className="text-3xl font-bold text-gray-900 dark:text-white">0%</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Reviews responded to</p>
-                </div>
+                </div> */}
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                   <div className="flex items-center justify-between mb-2">

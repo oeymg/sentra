@@ -67,16 +67,27 @@ function median(values: number[]) {
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
 
-    if (!user) {
+    // Get user with better error handling
+    const { data: authData, error: authError } = await supabase.auth.getUser()
+
+    if (authError) {
+      console.error('Auth error in dashboard overview:', authError)
+      return NextResponse.json({ error: 'Authentication failed' }, { status: 401 })
+    }
+
+    if (!authData?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const user = authData.user
     const { searchParams } = new URL(request.url)
     const requestedBusinessId = searchParams.get('businessId')
+
+    // Validate businessId if provided
+    if (requestedBusinessId && !requestedBusinessId.trim()) {
+      return NextResponse.json({ error: 'Invalid business ID' }, { status: 400 })
+    }
 
     let businessQuery = supabase.from('businesses').select('id').eq('user_id', user.id)
     if (requestedBusinessId) {
@@ -86,8 +97,8 @@ export async function GET(request: NextRequest) {
     const { data: businesses, error: businessesError } = await businessQuery
 
     if (businessesError) {
-      console.error('Failed to load businesses', businessesError)
-      return NextResponse.json({ error: 'Unable to load data' }, { status: 500 })
+      console.error('Failed to load businesses:', businessesError)
+      return NextResponse.json({ error: 'Unable to load data', details: businessesError.message }, { status: 500 })
     }
 
     if (requestedBusinessId && (!businesses || businesses.length === 0)) {
@@ -307,7 +318,40 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('Dashboard overview error', error)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    console.error('Dashboard overview error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
+    // Return 200 with empty stats so frontend doesn't break
+    return NextResponse.json({
+      stats: {
+        businessCount: 0,
+        connectedPlatforms: 0,
+        totalReviews: 0,
+        aiResponses: 0,
+        avgRating: 0,
+        responseRate: 0,
+        pendingReviews: 0,
+        weeklyChange: 0,
+      },
+      reviewTrend: getMonthBuckets().map((bucket) => ({
+        month: formatMonth(bucket),
+        reviews: 0,
+        responses: 0,
+        avgRating: 0,
+      })),
+      sentimentBreakdown: [
+        { label: 'Positive', value: 0 },
+        { label: 'Neutral', value: 0 },
+        { label: 'Negative', value: 0 },
+      ],
+      platformPerformance: [],
+      categoryBreakdown: [],
+      latestReviews: [],
+      responseTime: {
+        medianHours: null,
+        sameDayPercent: 0,
+      },
+      _error: errorMessage, // Include error details for debugging
+    })
   }
 }

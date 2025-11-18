@@ -47,12 +47,15 @@ create table public.businesses (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references public.profiles(id) on delete cascade not null,
   name text not null,
+  slug text unique not null,
   description text,
   address text,
   industry text,
   website text,
   logo_url text,
   google_place_id text,
+  yelp_business_id text,
+  tripadvisor_url text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );

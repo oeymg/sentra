@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
-import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
 import {
   ResponsiveContainer,
@@ -15,86 +13,32 @@ import {
   Bar,
 } from 'recharts'
 import { Layers3, PieChart, SlidersHorizontal, TrendingUp } from 'lucide-react'
-
-type OverviewResponse = {
-  stats: {
-    businessCount: number
-    connectedPlatforms: number
-    totalReviews: number
-    aiResponses: number
-    avgRating: number
-    responseRate: number
-    pendingReviews: number
-    weeklyChange: number
-  }
-  reviewTrend: Array<{ month: string; reviews: number; responses: number; avgRating: number }>
-  sentimentBreakdown: Array<{ label: string; value: number }>
-  platformPerformance: Array<{ platform: string; icon: string; reviews: number; responseRate: number }>
-  categoryBreakdown: Array<{ category: string; count: number; share: number }>
-  latestReviews: Array<{ id: string; platform: string; rating: number; sentiment: string | null; reviewed_at: string; has_response: boolean }>
-  responseTime: {
-    medianHours: number | null
-    sameDayPercent: number
-  }
-}
+import { useBusinessContext } from '@/contexts/BusinessContext'
+import { useOverview } from '@/hooks/useOverview'
+import { ChartSkeleton } from '@/components/dashboard/LoadingSkeleton'
+import { EmptyState } from '@/components/dashboard/EmptyState'
 
 export default function AnalyticsPage() {
-  const [overview, setOverview] = useState<OverviewResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { selectedBusiness, loading: businessLoading } = useBusinessContext()
+  const { data: overview, loading, error, refresh } = useOverview(selectedBusiness?.id)
+  const isLoading = businessLoading || loading
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const supabase = createClient()
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-
-        if (!user) {
-          throw new Error('You need to be signed in to view analytics.')
-        }
-
-        const { data: businesses } = await supabase
-          .from('businesses')
-          .select('id')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: true })
-
-        const firstBusinessId = businesses?.[0]?.id ?? null
-
-        const endpoint = firstBusinessId
-          ? `/api/dashboard/overview?businessId=${firstBusinessId}`
-          : '/api/dashboard/overview'
-
-        const response = await fetch(endpoint)
-        const payload = await response.json()
-
-        if (!response.ok) {
-          throw new Error(payload.error || 'Unable to load analytics data.')
-        }
-
-        if (!firstBusinessId || payload.stats.businessCount === 0) {
-          throw new Error('Add a business profile to unlock analytics.')
-        }
-
-        setOverview(payload)
-      } catch (err) {
-        console.error(err)
-        setError(err instanceof Error ? err.message : 'Unable to load analytics data.')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadData()
-  }, [])
-
-  if (loading) {
+  if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-full">
-          <div className="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin" />
+        <div className="p-12">
+          <div className="max-w-7xl mx-auto space-y-12">
+            <div className="mb-8">
+              <div className="h-12 bg-gray-200 rounded w-48 mb-3 animate-pulse" />
+              <div className="h-6 bg-gray-200 rounded w-96 animate-pulse" />
+            </div>
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <ChartSkeleton height={320} />
+              </div>
+              <ChartSkeleton height={256} />
+            </div>
+          </div>
         </div>
       </DashboardLayout>
     )
@@ -104,11 +48,35 @@ export default function AnalyticsPage() {
     return (
       <DashboardLayout>
         <div className="max-w-lg mx-auto text-center mt-24 space-y-4">
-          <p className="text-lg font-medium text-gray-800">{error ?? 'Analytics are currently unavailable.'}</p>
+          <p className="text-lg font-medium text-gray-800">
+            {error ?? 'Analytics are currently unavailable.'}
+          </p>
           <p className="text-sm text-gray-500">
             Confirm your Supabase credentials and try again. Analytics unlock automatically once we detect reviews.
           </p>
+          <button
+            onClick={() => refresh()}
+            className="px-4 py-2 bg-black text-white rounded-lg"
+          >
+            Retry
+          </button>
         </div>
+      </DashboardLayout>
+    )
+  }
+
+  if (overview.stats.businessCount === 0) {
+    return (
+      <DashboardLayout>
+        <EmptyState
+          icon={PieChart}
+          title="Analytics unlock after onboarding"
+          description="Add a business profile to start tracking sentiment, response times, and platform performance."
+          action={{
+            label: 'Add your first business',
+            onClick: () => window.location.href = '/dashboard/onboarding',
+          }}
+        />
       </DashboardLayout>
     )
   }
@@ -140,10 +108,11 @@ export default function AnalyticsPage() {
                 <p className="text-xs uppercase tracking-widest text-gray-500">Avg Rating</p>
                 <p className="text-3xl font-light text-black">{overview.stats.avgRating.toFixed(1)}</p>
               </div>
-              <div>
+              {/* Response rate metric - Hidden until tracking is implemented */}
+              {/* <div>
                 <p className="text-xs uppercase tracking-widest text-gray-500">Response rate</p>
                 <p className="text-3xl font-light text-black">{overview.stats.responseRate}%</p>
-              </div>
+              </div> */}
               <div>
                 <p className="text-xs uppercase tracking-widest text-gray-500">Pending</p>
                 <p className="text-3xl font-light text-black">{overview.stats.pendingReviews}</p>
@@ -222,10 +191,11 @@ export default function AnalyticsPage() {
                         <p className="text-xs text-gray-500">{platform.reviews} reviews</p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    {/* Response rate per platform - Hidden until tracking is implemented */}
+                    {/* <div className="text-right">
                       <p className="text-xs uppercase tracking-widest text-gray-400">Response rate</p>
                       <p className="text-lg font-light text-black">{platform.responseRate}%</p>
-                    </div>
+                    </div> */}
                   </div>
                 ))}
               </div>
@@ -258,7 +228,8 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          {/* Response timing section - Hidden until tracking is implemented */}
+          {/* <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="text-xs uppercase tracking-widest text-gray-500">Response timing</p>
@@ -281,7 +252,7 @@ export default function AnalyticsPage() {
                 <p className="text-3xl font-light text-black">{overview.stats.pendingReviews}</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </DashboardLayout>

@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 type Business = {
   id: string
   name: string
+  slug: string
   suburb: string | null
   googlePlaceId: string | null
 }
@@ -46,7 +47,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
 
       const { data } = await supabase
         .from('businesses')
-        .select('id,name,address,google_place_id')
+        .select('id,name,slug,address,google_place_id')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true })
 
@@ -54,6 +55,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
         data?.map((biz) => ({
           id: biz.id,
           name: biz.name,
+          slug: biz.slug || biz.id, // Fallback to ID if slug doesn't exist
           suburb: extractSuburb(biz.address),
           googlePlaceId: biz.google_place_id ?? null,
         })) ?? []

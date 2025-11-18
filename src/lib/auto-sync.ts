@@ -47,20 +47,21 @@ export async function autoSyncBusiness(
 
     const business = await businessRes.json()
     const platforms = await platformsRes.json()
+    const syncablePlatforms = Array.isArray(platforms) ? [...platforms] : []
 
     result.businessName = business.name
 
     // Check if any platforms are connected
-    if (!platforms || platforms.length === 0) {
+    if (!syncablePlatforms.length) {
       console.log('[AutoSync] No platforms connected for business:', businessId)
       result.success = true
       return result
     }
 
-    console.log(`[AutoSync] Starting sync for ${platforms.length} platform(s)`)
+    console.log(`[AutoSync] Starting sync for ${syncablePlatforms.length} platform(s)`)
 
     // Prepare sync tasks for each platform
-    const syncTasks = platforms.map(async (platform: any) => {
+    const syncTasks = syncablePlatforms.map(async (platform: any) => {
       const platformName = platform.platform_name || platform.name
       const platformSlug = platform.platform_slug || platform.slug
 
@@ -101,11 +102,25 @@ export async function autoSyncBusiness(
         }
 
         if (!response.ok) {
-          const error = await response.json()
-          throw new Error(error.error || `${platformName} sync failed`)
+          let errorPayload: { error?: string; details?: string; message?: string } = {}
+          try {
+            errorPayload = await response.json()
+          } catch (parseError) {
+            console.error('[AutoSync] Failed to parse error response', parseError)
+          }
+
+          const errorMessage =
+            errorPayload.details ||
+            errorPayload.error ||
+            errorPayload.message ||
+            `${platformName} sync failed`
+
+          const error = new Error(errorMessage)
+          ;(error as any).payload = errorPayload
+          throw error
         }
 
-        const data = await response.json()
+        const data = await response.json().catch(() => ({}))
         syncStatus.status = 'success'
         const reviewCount = data.reviewCount || data.reviews?.length || 0
         syncStatus.reviewCount = reviewCount
@@ -116,7 +131,12 @@ export async function autoSyncBusiness(
         onProgress?.(syncStatus)
       } catch (error) {
         syncStatus.status = 'error'
-        syncStatus.message = error instanceof Error ? error.message : `${platformName} sync failed`
+        const message =
+          error instanceof Error
+            ? error.message
+            : `${platformName} sync failed`
+
+        syncStatus.message = message
         console.error(`[AutoSync] ${platformName} error:`, error)
         onProgress?.(syncStatus)
       }

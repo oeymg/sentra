@@ -284,10 +284,10 @@ export default function PlatformsPage() {
                 ['google', 'reddit', 'yelp', 'trustpilot', 'facebook', 'tripadvisor'].includes(platform.slug)
               )
               .map((platform) => {
-                // Reddit is always "connected" via Claude AI scraping
-                const isConnected = platform.slug === 'reddit' ? true : selectedConnectionIds.has(platform.id)
+                // Reddit and TripAdvisor are always "connected" via Claude AI scraping
+                const isConnected = ['reddit', 'tripadvisor'].includes(platform.slug) ? true : selectedConnectionIds.has(platform.id)
                 const connection = connections.find((c) => c.platformId === platform.id)
-                const isComingSoon = ['yelp', 'trustpilot', 'facebook', 'tripadvisor'].includes(platform.slug)
+                const isComingSoon = ['trustpilot', 'facebook'].includes(platform.slug)
 
                 return (
                   <motion.div
@@ -322,7 +322,7 @@ export default function PlatformsPage() {
 
                     <div className="flex items-center justify-between mt-6">
                       {isConnected ? (
-                        platform.slug === 'reddit' ? (
+                        ['reddit', 'tripadvisor'].includes(platform.slug) ? (
                           <span className="px-4 py-2 text-sm italic opacity-70">
                             AI-powered
                           </span>

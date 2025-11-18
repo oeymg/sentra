@@ -16,6 +16,14 @@ export const redditReviewsSyncSchema = z.object({
   subreddits: z.array(z.string()).optional(),
 })
 
+export const tripAdvisorSyncSchema = z.object({
+  businessId: z.string().uuid('Invalid business ID'),
+  tripAdvisorUrl: z
+    .string()
+    .url('TripAdvisor URL must be a valid URL')
+    .optional(),
+})
+
 // Review Analysis API schemas
 export const reviewAnalyzeSchema = z.object({
   reviewId: z.string().uuid('Invalid review ID'),

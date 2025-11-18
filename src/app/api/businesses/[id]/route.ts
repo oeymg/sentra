@@ -24,7 +24,7 @@ export async function GET(
     // Fetch business and verify ownership
     const { data: business, error } = await supabase
       .from('businesses')
-      .select('id, name, industry, website, address, description, created_at')
+      .select('id, name, industry, website, address, description, created_at, tripadvisor_url')
       .eq('id', id)
       .eq('user_id', user.id)
       .single()

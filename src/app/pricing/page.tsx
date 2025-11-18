@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, ArrowLeft, Check } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check, TrendingUp, Clock } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
@@ -21,8 +21,8 @@ export default function Pricing() {
         </div>
 
         <div className="max-w-5xl mx-auto relative">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm mb-8 hover:opacity-60 transition-opacity animate-fadeIn">
-            <ArrowLeft className="w-4 h-4" />
+          <Link href="/" className="inline-flex items-center gap-2 text-sm mb-8 text-black hover:opacity-60 transition-opacity animate-fadeIn">
+            <ArrowLeft className="w-4 h-4 text-black" />
             Back
           </Link>
           <h1 className="text-[5rem] md:text-[8rem] leading-[0.85] font-light mb-10 tracking-tighter text-black animate-fadeIn" style={{ animationDelay: '0.1s' }}>
@@ -30,9 +30,13 @@ export default function Pricing() {
             <br />
             <span className="italic font-normal">pricing.</span>
           </h1>
-          <p className="text-2xl text-black mb-16 max-w-2xl font-light leading-relaxed animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+          <p className="text-2xl text-black mb-6 max-w-2xl font-light leading-relaxed animate-fadeIn" style={{ animationDelay: '0.2s' }}>
             Start free. Scale when you need to. No hidden fees.
           </p>
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200 rounded-full mb-16 animate-fadeIn shadow-sm" style={{ animationDelay: '0.3s' }}>
+            <TrendingUp className="w-4 h-4 text-green-600" />
+            <span className="text-sm font-medium text-black">One extra star = 5-9% revenue boost annually</span>
+          </div>
         </div>
       </section>
 
@@ -43,7 +47,11 @@ export default function Pricing() {
           <div className="border border-black p-10 group hover:shadow-xl transition-all duration-300 bg-white text-black">
             <div className="text-sm uppercase tracking-widest mb-4 text-black">Free</div>
             <div className="text-6xl font-light mb-2 text-black">$0</div>
-            <div className="text-sm text-black mb-8">Forever</div>
+            <div className="text-sm text-black mb-4">Forever</div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg mb-6">
+              <Clock className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-semibold text-blue-700">Save 5+ hours/week</span>
+            </div>
             <Link
               href="/auth/signup"
               className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-white border border-black text-black hover:bg-black hover:text-white transition-all mb-10"
@@ -216,17 +224,6 @@ export default function Pricing() {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               </Link>
 
-              {/* Live user counter */}
-              <div className="flex items-center gap-2 text-sm">
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-black border-2 border-white animate-pulse" style={{ animationDelay: '0s' }} />
-                  <div className="w-8 h-8 rounded-full bg-black border-2 border-white animate-pulse" style={{ animationDelay: '0.2s' }} />
-                  <div className="w-8 h-8 rounded-full bg-black border-2 border-white animate-pulse" style={{ animationDelay: '0.4s' }} />
-                </div>
-                <span className="text-black text-xs">
-                  <span className="font-light">127 people</span> signed up today
-                </span>
-              </div>
             </div>
           </div>
         </div>

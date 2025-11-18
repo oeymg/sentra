@@ -27,11 +27,17 @@ export default function Settings() {
     description: '',
     address: '',
     googlePlaceId: '',
+    yelpBusinessId: '',
+    tripAdvisorUrl: '',
   })
   const [placeLookupLoading, setPlaceLookupLoading] = useState(false)
   const [placeLookupStatus, setPlaceLookupStatus] = useState<string | null>(null)
+  const [yelpLookupLoading, setYelpLookupLoading] = useState(false)
+  const [yelpLookupStatus, setYelpLookupStatus] = useState<string | null>(null)
   const [syncStatus, setSyncStatus] = useState<string | null>(null)
   const [originalPlaceId, setOriginalPlaceId] = useState<string>('')
+  const [originalYelpId, setOriginalYelpId] = useState<string>('')
+  const [originalTripAdvisorUrl, setOriginalTripAdvisorUrl] = useState<string>('')
 
   useEffect(() => {
     const loadData = async () => {
@@ -55,6 +61,8 @@ export default function Settings() {
         if (businesses && businesses.length > 0) {
           const biz = businesses[0]
           const placeId = biz.google_place_id || ''
+          const yelpId = biz.yelp_business_id || ''
+          const tripAdvisorUrl = biz.tripadvisor_url || ''
           setBusiness({
             id: biz.id,
             name: biz.name || '',
@@ -63,8 +71,12 @@ export default function Settings() {
             description: biz.description || '',
             address: biz.address || '',
             googlePlaceId: placeId,
+            yelpBusinessId: yelpId,
+            tripAdvisorUrl: tripAdvisorUrl,
           })
           setOriginalPlaceId(placeId)
+          setOriginalYelpId(yelpId)
+          setOriginalTripAdvisorUrl(tripAdvisorUrl)
         }
       }
     }
@@ -111,6 +123,8 @@ export default function Settings() {
           description: business.description,
           address: business.address || null,
           google_place_id: business.googlePlaceId || null,
+          yelp_business_id: business.yelpBusinessId || null,
+          tripadvisor_url: business.tripAdvisorUrl || null,
         })
         .eq('id', business.id)
 
@@ -124,6 +138,28 @@ export default function Settings() {
           setSyncStatus('Syncing reviews from Google...')
           await syncGoogleReviews(business.id)
           setOriginalPlaceId(business.googlePlaceId)
+        }
+      }
+
+      if (business.id && business.yelpBusinessId) {
+        await ensureYelpPlatformConnection(supabase, business.id, business.yelpBusinessId)
+
+        // Auto-sync reviews if Yelp Business ID was just added or changed
+        if (business.yelpBusinessId && business.yelpBusinessId !== originalYelpId) {
+          setSyncStatus('Syncing reviews from Yelp...')
+          await syncYelpReviews(business.id)
+          setOriginalYelpId(business.yelpBusinessId)
+        }
+      }
+
+      if (business.id && business.tripAdvisorUrl) {
+        await ensureTripAdvisorPlatformConnection(supabase, business.id, business.tripAdvisorUrl)
+
+        // Auto-sync reviews if TripAdvisor URL was just added or changed
+        if (business.tripAdvisorUrl && business.tripAdvisorUrl !== originalTripAdvisorUrl) {
+          setSyncStatus('Syncing reviews from TripAdvisor using AI...')
+          await syncTripAdvisorReviews(business.id, business.tripAdvisorUrl)
+          setOriginalTripAdvisorUrl(business.tripAdvisorUrl)
         }
       }
 
@@ -198,6 +234,95 @@ export default function Settings() {
       setPlaceLookupStatus(err instanceof Error ? err.message : 'Failed to lookup Place ID.')
     } finally {
       setPlaceLookupLoading(false)
+    }
+  }
+
+  const handleLookupYelpId = async () => {
+    if (!business.name || !business.address) {
+      setYelpLookupStatus('Enter business name and address first.')
+      return
+    }
+
+    setYelpLookupLoading(true)
+    setYelpLookupStatus(null)
+
+    try {
+      const response = await fetch(
+        `/api/yelp-reviews/lookup?name=${encodeURIComponent(business.name)}&location=${encodeURIComponent(business.address)}`
+      )
+      const payload = await response.json()
+      if (!response.ok) {
+        throw new Error(payload.error || 'Lookup failed')
+      }
+
+      setBusiness((prev) => ({
+        ...prev,
+        yelpBusinessId: payload.business.id,
+      }))
+      setYelpLookupStatus(`Matched: ${payload.business.name}`)
+    } catch (err) {
+      console.error(err)
+      setYelpLookupStatus(err instanceof Error ? err.message : 'Failed to lookup Yelp Business ID.')
+    } finally {
+      setYelpLookupLoading(false)
+    }
+  }
+
+  const syncYelpReviews = async (businessId: string) => {
+    try {
+      const response = await fetch('/api/yelp-reviews/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessId }),
+      })
+
+      const payload = await response.json()
+
+      if (!response.ok) {
+        throw new Error(payload.error || 'Sync failed')
+      }
+
+      const count = payload.reviews || 0
+      let message = `Successfully synced ${count} review${count !== 1 ? 's' : ''} from Yelp!`
+
+      if (payload.note) {
+        message += ` Note: ${payload.note}`
+      }
+
+      setSyncStatus(message)
+
+      // Clear sync status after 8 seconds
+      setTimeout(() => setSyncStatus(null), 8000)
+    } catch (err) {
+      console.error('Yelp review sync error:', err)
+      setSyncStatus(err instanceof Error ? err.message : 'Failed to sync Yelp reviews')
+    }
+  }
+
+  const syncTripAdvisorReviews = async (businessId: string, tripAdvisorUrl: string) => {
+    try {
+      const response = await fetch('/api/tripadvisor-reviews/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessId, tripAdvisorUrl }),
+      })
+
+      const payload = await response.json()
+
+      if (!response.ok) {
+        throw new Error(payload.error || 'Sync failed')
+      }
+
+      const count = payload.reviews || 0
+      const message = `Successfully synced ${count} review${count !== 1 ? 's' : ''} from TripAdvisor using AI!`
+
+      setSyncStatus(message)
+
+      // Clear sync status after 8 seconds
+      setTimeout(() => setSyncStatus(null), 8000)
+    } catch (err) {
+      console.error('TripAdvisor review sync error:', err)
+      setSyncStatus(err instanceof Error ? err.message : 'Failed to sync TripAdvisor reviews')
     }
   }
 
@@ -428,6 +553,48 @@ export default function Settings() {
                   )}
                 </div>
 
+                <div className="space-y-2">
+                  <label className="block text-sm font-light text-black">
+                    Yelp Business ID
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="text"
+                      value={business.yelpBusinessId}
+                      readOnly
+                      className="flex-1 px-4 py-3 border border-gray-300 text-black bg-gray-50"
+                      placeholder="Run lookup to fetch automatically"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleLookupYelpId}
+                      disabled={yelpLookupLoading}
+                      className="px-4 py-3 bg-black text-white rounded-lg disabled:opacity-50"
+                    >
+                      {yelpLookupLoading ? 'Searching…' : 'Lookup'}
+                    </button>
+                  </div>
+                  {yelpLookupStatus && (
+                    <p className="text-xs text-gray-500">{yelpLookupStatus}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-light mb-2 text-black">
+                    TripAdvisor URL
+                  </label>
+                  <input
+                    type="url"
+                    value={business.tripAdvisorUrl}
+                    onChange={(e) => setBusiness({ ...business, tripAdvisorUrl: e.target.value })}
+                    placeholder="https://www.tripadvisor.com/Restaurant_Review-g..."
+                    className="w-full px-4 py-3 border border-gray-300 text-black focus:outline-none focus:border-black transition-colors"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Paste your business's TripAdvisor page URL. Reviews will be extracted using AI.
+                  </p>
+                </div>
+
                 <div>
                   <label className="block text-sm font-light mb-2 text-black">
                     Description
@@ -630,5 +797,71 @@ async function ensureGooglePlatformConnection(
 
   if (error) {
     console.error('Failed to connect Google platform', error)
+  }
+}
+
+async function ensureYelpPlatformConnection(
+  supabase: ReturnType<typeof createClient>,
+  businessId: string,
+  yelpBusinessId: string
+) {
+  const { data: platform, error: platformError } = await supabase
+    .from('review_platforms')
+    .select('id')
+    .eq('slug', 'yelp')
+    .single()
+
+  if (platformError || !platform) {
+    console.warn('Yelp platform row not found', platformError)
+    return
+  }
+
+  const { error } = await supabase
+    .from('business_platforms')
+    .upsert(
+      {
+        business_id: businessId,
+        platform_id: platform.id,
+        platform_business_id: yelpBusinessId,
+        is_connected: true,
+      },
+      { onConflict: 'business_id,platform_id' }
+    )
+
+  if (error) {
+    console.error('Failed to connect Yelp platform', error)
+  }
+}
+
+async function ensureTripAdvisorPlatformConnection(
+  supabase: ReturnType<typeof createClient>,
+  businessId: string,
+  tripAdvisorUrl: string
+) {
+  const { data: platform, error: platformError } = await supabase
+    .from('review_platforms')
+    .select('id')
+    .eq('slug', 'tripadvisor')
+    .single()
+
+  if (platformError || !platform) {
+    console.warn('TripAdvisor platform row not found', platformError)
+    return
+  }
+
+  const { error } = await supabase
+    .from('business_platforms')
+    .upsert(
+      {
+        business_id: businessId,
+        platform_id: platform.id,
+        platform_business_id: tripAdvisorUrl,
+        is_connected: true,
+      },
+      { onConflict: 'business_id,platform_id' }
+    )
+
+  if (error) {
+    console.error('Failed to connect TripAdvisor platform', error)
   }
 }

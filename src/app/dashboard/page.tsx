@@ -1,13 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import InsightsCard from '@/components/dashboard/InsightsCard'
 import SyncToast from '@/components/SyncToast'
-import { createClient } from '@/lib/supabase/client'
 import { smartAutoSync, type SyncStatus } from '@/lib/auto-sync'
 import { useBusinessContext } from '@/contexts/BusinessContext'
+import { useOverview } from '@/hooks/useOverview'
+import { StatsCard } from '@/components/dashboard/StatsCard'
+import { StatsCardSkeleton } from '@/components/dashboard/LoadingSkeleton'
+import { EmptyState } from '@/components/dashboard/EmptyState'
 import {
   Area,
   AreaChart,
@@ -31,154 +33,117 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-type OverviewResponse = {
-  stats: {
-    businessCount: number
-    connectedPlatforms: number
-    totalReviews: number
-    aiResponses: number
-    avgRating: number
-    responseRate: number
-    pendingReviews: number
-    weeklyChange: number
-  }
-  reviewTrend: Array<{ month: string; reviews: number; responses: number; avgRating: number }>
-  sentimentBreakdown: Array<{ label: string; value: number }>
-  platformPerformance: Array<{ platform: string; icon: string; reviews: number; responseRate: number }>
-  categoryBreakdown: Array<{ category: string; count: number; share: number }>
-  latestReviews: Array<{ id: string; platform: string; rating: number; sentiment: string | null; reviewed_at: string; has_response: boolean }>
-  responseTime: {
-    medianHours: number | null
-    sameDayPercent: number
-  }
-}
-
 export default function Dashboard() {
-  const router = useRouter()
-  const { selectedBusiness } = useBusinessContext()
-  const [overview, setOverview] = useState<OverviewResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { selectedBusiness, loading: businessLoading } = useBusinessContext()
+  const {
+    data: overview,
+    loading: overviewLoading,
+    error,
+    refresh,
+  } = useOverview(selectedBusiness?.id)
   const [syncStatuses, setSyncStatuses] = useState<SyncStatus[]>([])
   const [showSyncToast, setShowSyncToast] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
+  const [publicLink, setPublicLink] = useState('')
+  const isLoading = businessLoading || overviewLoading
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const supabase = createClient()
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
+    if (typeof window === 'undefined') return
+    if (selectedBusiness) {
+      // Use slug for prettier URLs
+      setPublicLink(`${window.location.origin}/review/${selectedBusiness.slug}`)
+    } else {
+      setPublicLink('')
+    }
+  }, [selectedBusiness?.id])
 
-        if (!user) {
-          router.push('/auth/login')
-          return
-        }
-
-        if (!selectedBusiness) {
-          setLoading(false)
-          return
-        }
-
-        console.log('[Dashboard] Loading data for business:', selectedBusiness.id, selectedBusiness.name)
-
-        // Clear previous overview when switching businesses
-        setOverview(null)
-        setLoading(true)
-
-        const endpoint = `/api/dashboard/overview?businessId=${selectedBusiness.id}`
-
-        const response = await fetch(endpoint)
-        if (response.status === 401) {
-          router.push('/auth/login')
-          return
-        }
-
-        const payload = await response.json()
-        if (!response.ok) {
-          throw new Error(payload.error || 'Failed to load dashboard data')
-        }
-
-        setOverview(payload)
-
-        // Auto-sync reviews if business has connected platforms
-        if (selectedBusiness && payload.stats.connectedPlatforms > 0) {
-          console.log('[Dashboard] Triggering smart auto-sync')
-          setSyncStatuses([])
-          setShowSyncToast(true)
-
-          smartAutoSync(selectedBusiness.id, false, (status) => {
-            setSyncStatuses((prev) => {
-              const existing = prev.find((s) => s.platform === status.platform)
-              if (existing) {
-                return prev.map((s) => (s.platform === status.platform ? status : s))
-              }
-              return [...prev, status]
-            })
-          }).then((result) => {
-            if (result) {
-              console.log('[Dashboard] Auto-sync complete:', result.totalReviews, 'reviews synced')
-              // Reload dashboard data if reviews were synced
-              if (result.totalReviews > 0) {
-                fetch(endpoint)
-                  .then((res) => res.json())
-                  .then((data) => setOverview(data))
-                  .catch(console.error)
-              }
-              // Auto-hide toast after 5 seconds
-              setTimeout(() => {
-                setShowSyncToast(false)
-              }, 5000)
-            } else {
-              // No sync needed (synced recently)
-              setShowSyncToast(false)
-            }
-          })
-        }
-      } catch (err) {
-        console.error(err)
-        setError(err instanceof Error ? err.message : 'Failed to load dashboard data')
-      } finally {
-        setLoading(false)
-      }
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!selectedBusiness || !overview || overview.stats.connectedPlatforms === 0) {
+      setShowSyncToast(false)
+      return
     }
 
-    loadData()
-  }, [router, selectedBusiness])
+    let isMounted = true
+    let hideToastTimeout: ReturnType<typeof setTimeout> | null = null
+
+    console.log('[Dashboard] Triggering smart auto-sync')
+    setSyncStatuses([])
+    setShowSyncToast(true)
+
+    smartAutoSync(selectedBusiness.id, false, (status) => {
+      if (!isMounted) return
+      setSyncStatuses((prev) => {
+        const existing = prev.find((s) => s.platform === status.platform)
+        if (existing) {
+          return prev.map((s) => (s.platform === status.platform ? status : s))
+        }
+        return [...prev, status]
+      })
+    }).then((result) => {
+      if (!isMounted) return
+
+      if (!result) {
+        setShowSyncToast(false)
+        return
+      }
+
+      if (result.totalReviews > 0) {
+        refresh()
+      }
+
+      hideToastTimeout = setTimeout(() => {
+        if (isMounted) {
+          setShowSyncToast(false)
+        }
+      }, 5000)
+    })
+
+    return () => {
+      isMounted = false
+      if (hideToastTimeout) {
+        clearTimeout(hideToastTimeout)
+      }
+    }
+  }, [overview?.stats.connectedPlatforms, refresh, selectedBusiness?.id])
+
 
   const handleRefresh = async () => {
-    if (!selectedBusiness || refreshing) return
+    if (refreshing) return
 
     setRefreshing(true)
     try {
-      const endpoint = `/api/dashboard/overview?businessId=${selectedBusiness.id}`
-      const response = await fetch(endpoint)
-      if (response.ok) {
-        const payload = await response.json()
-        setOverview(payload)
-      }
+      await refresh()
     } catch (err) {
-      console.error('Failed to refresh:', err)
+      console.error('Failed to refresh dashboard:', err)
     } finally {
       setRefreshing(false)
     }
   }
 
   const handleCopyLink = () => {
-    if (!selectedBusiness) return
-    const url = `${window.location.origin}/reviews/${selectedBusiness.id}`
-    navigator.clipboard.writeText(url)
+    if (!publicLink) return
+    navigator.clipboard.writeText(publicLink)
     setCopiedLink(true)
     setTimeout(() => setCopiedLink(false), 2000)
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-full">
-          <div className="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin" />
+        <div className="p-12">
+          <div className="max-w-7xl mx-auto space-y-12">
+            <div className="mb-8">
+              <div className="h-12 bg-gray-200 rounded w-64 mb-3 animate-pulse" />
+              <div className="h-6 bg-gray-200 rounded w-96 animate-pulse" />
+            </div>
+            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <StatsCardSkeleton key={i} />
+              ))}
+            </div>
+          </div>
         </div>
       </DashboardLayout>
     )
@@ -192,10 +157,7 @@ export default function Dashboard() {
           <p className="text-sm text-gray-500">{error}</p>
           <button
             onClick={() => {
-              setLoading(true)
-              setError(null)
-              setOverview(null)
-              router.refresh()
+              refresh()
             }}
             className="px-4 py-2 bg-black text-white rounded-lg"
           >
@@ -211,47 +173,51 @@ export default function Dashboard() {
   if (overview.stats.businessCount === 0) {
     return (
       <DashboardLayout>
-        <div className="flex flex-col items-center justify-center h-full text-center space-y-4 px-6">
-          <h1 className="text-4xl font-light text-black">Let&apos;s add your first business</h1>
-          <p className="text-gray-600 max-w-md">
-            Connect a business profile to start aggregating reviews, running AI analysis, and sending replies from Sentra.
-          </p>
-          <Link
-            href="/dashboard/onboarding"
-            className="px-8 py-3 bg-black text-white rounded-lg hover:bg-gray-900 transition"
-          >
-            Start onboarding
-          </Link>
-        </div>
+        <EmptyState
+          icon={Link2}
+          title="Let's add your first business"
+          description="Connect a business profile to start aggregating reviews, running AI analysis, and sending replies from Sentra."
+          action={{
+            label: 'Start onboarding',
+            onClick: () => window.location.href = '/dashboard/onboarding',
+          }}
+        />
       </DashboardLayout>
     )
   }
 
   const statsCards = [
     {
-      label: 'Connected Platforms',
+      title: 'Connected Platforms',
       value: overview.stats.connectedPlatforms,
-      helper: 'Active integrations',
+      subtitle: 'Active integrations',
       icon: Link2,
     },
     {
-      label: 'Total Reviews',
+      title: 'Total Reviews',
       value: overview.stats.totalReviews,
-      helper: 'All time',
+      subtitle: 'All time',
       icon: MessageSquare,
     },
     {
-      label: 'Average Rating',
+      title: 'Average Rating',
       value: overview.stats.avgRating.toFixed(1),
-      helper: 'Across every platform',
+      subtitle: 'Across every platform',
       icon: Star,
     },
-    {
-      label: 'Response Rate',
+    // Response Rate metric - Hidden until tracking is implemented
+    /* {
+      title: 'Response Rate',
       value: `${overview.stats.responseRate}%`,
-      helper: 'Reviews with replies',
+      subtitle: 'Reviews with replies',
       icon: RefreshCw,
-    },
+    }, */
+  ]
+  const gradients = [
+    'bg-gradient-to-br from-blue-500 to-cyan-500',
+    'bg-gradient-to-br from-purple-500 to-pink-500',
+    'bg-gradient-to-br from-orange-500 to-red-500',
+    'bg-gradient-to-br from-green-500 to-emerald-500',
   ]
 
   return (
@@ -287,90 +253,72 @@ export default function Dashboard() {
           </div>
 
           <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {statsCards.map((stat, idx) => {
-              const Icon = stat.icon
-              const gradients = [
-                'from-blue-500 to-cyan-500',
-                'from-purple-500 to-pink-500',
-                'from-orange-500 to-red-500',
-                'from-green-500 to-emerald-500'
-              ]
-              return (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                >
-                  {/* Gradient Background on Hover */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${gradients[idx]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+            {statsCards.map((stat, idx) => (
+              <motion.div
+                key={stat.title}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+              >
+                <StatsCard
+                  title={stat.title}
+                  value={stat.value}
+                  subtitle={stat.subtitle}
+                  icon={stat.icon}
+                  gradient={gradients[idx]}
+                />
+              </motion.div>
+            ))}
 
-                  <div className="relative">
-                    <div className="flex items-center justify-between mb-6">
-                      <p className="text-xs uppercase tracking-widest text-gray-500 font-semibold">{stat.label}</p>
-                      <span className={`p-3 rounded-xl bg-gradient-to-br ${gradients[idx]} text-white shadow-md`}>
-                        <Icon className="w-5 h-5" />
-                      </span>
-                    </div>
-                    <div className="text-5xl font-light text-black mb-2">{stat.value}</div>
-                    <p className="text-sm text-gray-600">{stat.helper}</p>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
-
-          {/* Shareable Public Reviews Link */}
-          {selectedBusiness && overview.stats.totalReviews > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 shadow-sm"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <ExternalLink className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-medium text-gray-900">Share your reviews with customers</h3>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Show potential customers what people are saying about your business. This public page displays all your reviews and responses.
-                  </p>
+            {/* Review Hub Page - Single Condensed Card */}
+            {selectedBusiness && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all h-full flex flex-col"
+              >
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 bg-white border border-blue-200 rounded-lg px-4 py-2 text-sm text-gray-700 font-mono overflow-x-auto">
-                      {typeof window !== 'undefined' && `${window.location.origin}/reviews/${selectedBusiness.id}`}
+                    <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg">
+                      <ExternalLink className="w-4 h-4 text-white" />
                     </div>
-                    <button
-                      onClick={handleCopyLink}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition whitespace-nowrap"
-                    >
-                      {copiedLink ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          Copy Link
-                        </>
-                      )}
-                    </button>
-                    <Link
-                      href={`/reviews/${selectedBusiness.id}`}
-                      target="_blank"
-                      className="inline-flex items-center gap-2 px-4 py-2 border border-blue-200 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition whitespace-nowrap"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Preview
-                    </Link>
+                    <div>
+                      <p className="text-xs uppercase tracking-widest text-gray-500 mb-0.5">Your page</p>
+                      <h3 className="text-sm font-semibold text-gray-900">Review Hub</h3>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
+
+                <div className="mt-auto space-y-2">
+                  <button
+                    onClick={handleCopyLink}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 transition-colors"
+                  >
+                    {copiedLink ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-green-600" />
+                        <span className="text-green-600">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copy Link</span>
+                      </>
+                    )}
+                  </button>
+                  <Link
+                    href={`/review/${selectedBusiness.slug}`}
+                    target="_blank"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg text-xs font-medium text-white transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Preview</span>
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+          </div>
 
           {/* AI-Powered Insights */}
           {overview.stats.totalReviews > 0 && selectedBusiness && (
@@ -444,7 +392,8 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-3">
+              {/* Response time metric - Hidden until tracking is implemented */}
+              {/* <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-widest text-gray-500 mb-1">Response time</p>
@@ -460,7 +409,7 @@ export default function Dashboard() {
                   <span>Same-day responses</span>
                   <span className="text-black font-medium">{overview.responseTime.sameDayPercent}%</span>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -548,10 +497,11 @@ export default function Dashboard() {
                       <p className="text-xs text-gray-500">{platform.reviews} reviews</p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  {/* Response rate per platform - Hidden until tracking is implemented */}
+                  {/* <div className="text-right">
                     <p className="text-sm text-gray-500 uppercase tracking-widest">Response rate</p>
                     <p className="text-lg font-light text-black">{platform.responseRate}%</p>
-                  </div>
+                  </div> */}
                 </div>
               ))}
             </div>

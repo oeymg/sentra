@@ -5,10 +5,16 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { LayoutDashboard, Star, Settings, Link2, LogOut, TrendingUp, Lightbulb, ChevronDown, ChevronRight, Menu, X, RefreshCw } from 'lucide-react'
+import { LayoutDashboard, Star, Link2, TrendingUp, Menu, X, RefreshCw, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { BusinessInsight } from '@/lib/ai/claude'
 import { useBusinessContext } from '@/contexts/BusinessContext'
+import { AIChatbot } from '@/components/dashboard/AIChatbot'
+import { BusinessSelector } from '@/components/dashboard/BusinessSelector'
+import { SidebarNav } from '@/components/dashboard/sidebar/SidebarNav'
+import { SidebarInsights } from '@/components/dashboard/sidebar/SidebarInsights'
+import { SidebarQuickStats } from '@/components/dashboard/sidebar/SidebarQuickStats'
+import { SidebarUserPanel } from '@/components/dashboard/sidebar/SidebarUserPanel'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { selectedBusiness } = useBusinessContext()
@@ -16,7 +22,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showGrowthTips, setShowGrowthTips] = useState(false)
   const [quickStats, setQuickStats] = useState({
     totalReviews: 0,
     avgRating: 0,
@@ -56,21 +61,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     try {
       const response = await fetch(`/api/dashboard/overview?businessId=${businessId}`)
       if (!response.ok) {
-        throw new Error('Failed to load stats')
+        const errorText = await response.text()
+        console.error('Dashboard API error:', response.status, errorText)
+        throw new Error(`Failed to load stats: ${response.status}`)
       }
       const payload = await response.json()
+
+      // Safely extract stats with defaults
       setQuickStats({
-        totalReviews: payload.stats.totalReviews,
-        avgRating: payload.stats.avgRating,
-        pendingReviews: payload.stats.pendingReviews,
+        totalReviews: payload?.stats?.totalReviews ?? 0,
+        avgRating: payload?.stats?.avgRating ?? 0,
+        pendingReviews: payload?.stats?.pendingReviews ?? 0,
       })
 
       // Load AI insights if we have reviews
-      if (payload.stats.totalReviews > 0) {
+      if (payload?.stats?.totalReviews > 0) {
         loadAiInsights(businessId)
       }
     } catch (error) {
-      console.error('Sidebar stats load failed', error)
+      console.error('Sidebar stats load failed:', error)
+      // Set defaults on error
+      setQuickStats({ totalReviews: 0, avgRating: 0, pendingReviews: 0 })
     } finally {
       setStatsLoading(false)
     }
@@ -169,22 +180,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const mainNavItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/dashboard/reviews', icon: Star, label: 'Reviews' },
+    { href: '/dashboard/campaigns', icon: Mail, label: 'Campaigns' },
     { href: '/dashboard/analytics', icon: TrendingUp, label: 'Analytics' },
     { href: '/dashboard/platforms', icon: Link2, label: 'Platforms' },
   ]
-
-  const categoryEmojis = {
-    response_strategy: '💬',
-    customer_satisfaction: '😊',
-    operational: '⚙️',
-    marketing: '📢',
-  }
-
-  const priorityEmojis = {
-    high: '🔴',
-    medium: '🟡',
-    low: '🔵',
-  }
 
   return (
     <>
@@ -192,6 +191,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {loading && <LoadingSplash key="splash" />}
       </AnimatePresence>
       {!loading && (
+        <>
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
           {/* Mobile Header */}
           <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-50">
@@ -234,213 +234,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </AnimatePresence>
 
           {/* Fixed Sidebar */}
-          <aside className={`fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-lg z-50 overflow-y-auto transition-transform duration-300 ${
-            mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0`}>
-        {/* Logo */}
-        <div className="p-6 border-b border-gray-200">
-          <Link href="/dashboard" className="group">
-            <motion.div
-              className="text-2xl font-bold bg-gradient-to-r from-black via-gray-800 to-black bg-clip-text text-transparent"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400 }}
-            >
-              sentra
-            </motion.div>
-            <p className="text-xs text-gray-500 mt-1">
-              {selectedBusiness
-                ? `${selectedBusiness.name}${selectedBusiness.suburb ? ` • ${selectedBusiness.suburb}` : ''}`
-                : 'Add your first business'}
-            </p>
-          </Link>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          {/* Main Navigation */}
-          <div className="mb-6">
-            <p className="text-xs uppercase tracking-widest text-gray-400 mb-2 px-4">Main</p>
-            <ul className="space-y-1">
-              {mainNavItems.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href
-                return (
-                  <li key={item.href}>
-                    <Link href={item.href}>
-                      <motion.div
-                        className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                          isActive
-                            ? 'bg-black text-white shadow-md'
-                            : 'text-gray-700 hover:bg-gray-100'
-                        }`}
-                        whileHover={{ x: isActive ? 0 : 4 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        {isActive && (
-                          <motion.div
-                            className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r"
-                            layoutId="activeIndicator"
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                          />
-                        )}
-                        <Icon className="w-5 h-5" />
-                        <span className="font-light">{item.label}</span>
-                      </motion.div>
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-
-          {/* AI Insights Section */}
-          <div className="mb-6">
-            <motion.button
-              onClick={() => setShowGrowthTips(!showGrowthTips)}
-              className="w-full flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              whileHover={{ x: 2 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-md">
-                  <Lightbulb className="w-3.5 h-3.5 text-white" />
-                </div>
-                <span className="text-xs uppercase tracking-widest font-medium">AI Insights</span>
-              </div>
-              {showGrowthTips ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              )}
-            </motion.button>
-
-            <AnimatePresence>
-              {showGrowthTips && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  {insightsLoading ? (
-                    <div className="mt-2 pl-4 px-4 py-2">
-                      <div className="h-3 bg-gray-200 rounded animate-pulse mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                    </div>
-                  ) : aiInsights.length > 0 ? (
-                    <ul className="mt-2 space-y-1 pl-4">
-                      {aiInsights.map((insight, index) => (
-                        <li key={index}>
-                          <div
-                            className="block px-4 py-2 text-xs text-gray-600 hover:text-black hover:bg-gray-50 rounded-md transition-colors cursor-pointer group"
-                            title={insight.description}
-                          >
-                            <div className="flex items-start gap-2">
-                              <span className="text-sm mt-0.5">{categoryEmojis[insight.category]}</span>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-1 mb-1">
-                                  <span className="text-xs">{priorityEmojis[insight.priority]}</span>
-                                  <span className="font-medium text-gray-900 group-hover:text-black">
-                                    {insight.title}
-                                  </span>
-                                </div>
-                                <p className="text-xs text-gray-500 line-clamp-2">
-                                  {insight.description}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                      <li>
-                        <Link
-                          href="/dashboard"
-                          className="block px-4 py-2 text-sm text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-md transition-colors font-medium"
-                        >
-                          View All Insights →
-                        </Link>
-                      </li>
-                    </ul>
-                  ) : (
-                    <div className="mt-2 pl-4 px-4 py-2 text-xs text-gray-500">
-                      No insights available yet. Sync reviews to get AI-powered recommendations.
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="mb-6 p-4 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-lg">
-            <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Quick Stats</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">Total Reviews</span>
-                <span className="text-sm font-semibold text-black">
-                  {statsLoading ? '—' : quickStats.totalReviews}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">Avg Rating</span>
-                <span className="text-sm font-semibold text-black">
-                  {statsLoading ? '—' : quickStats.avgRating.toFixed(1)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">Pending</span>
-                <span className="text-sm font-semibold text-orange-600">
-                  {statsLoading ? '—' : quickStats.pendingReviews}
-                </span>
-              </div>
-            </div>
-          </div>
-
-        </nav>
-
-        {/* User section */}
-        <div className="p-4 border-t border-gray-200 bg-gradient-to-t from-gray-50 to-white">
-          <div className="mb-3 px-4 py-2 bg-white rounded-lg border border-gray-100">
-            <div className="text-xs uppercase tracking-widest text-gray-500 mb-1">
-              Signed in as
-            </div>
-            <div className="text-sm text-black font-light truncate">
-              {user?.user_metadata?.full_name || user?.email}
-            </div>
-          </div>
-          <Link href="/dashboard/settings">
-            <motion.div
-              className={`relative w-full flex items-center gap-3 px-4 py-3 mb-3 rounded-lg transition-all duration-200 ${
-                pathname === '/dashboard/settings'
-                  ? 'bg-black text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-              whileHover={{ x: pathname === '/dashboard/settings' ? 0 : 4 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {pathname === '/dashboard/settings' && (
-                <motion.div
-                  className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r"
-                  layoutId="activeIndicator"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-              )}
-              <Settings className="w-5 h-5" />
-              <span className="font-light">Settings</span>
-            </motion.div>
-          </Link>
-          <motion.button
-            onClick={handleSignOut}
-            className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            whileHover={{ x: 4 }}
-            whileTap={{ scale: 0.98 }}
+          <aside
+            className={`fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-lg z-50 overflow-y-auto transition-transform duration-300 ${
+              mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            } lg:translate-x-0`}
           >
-            <LogOut className="w-5 h-5" />
-            <span className="font-light">Sign out</span>
-          </motion.button>
-        </div>
-      </aside>
+            <div className="p-6 border-b border-gray-200 space-y-4">
+              <Link href="/dashboard" className="group block">
+                <motion.div
+                  className="text-2xl font-bold bg-gradient-to-r from-black via-gray-800 to-black bg-clip-text text-transparent"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: 'spring', stiffness: 400 }}
+                >
+                  sentra
+                </motion.div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {selectedBusiness
+                    ? `${selectedBusiness.name}${
+                        selectedBusiness.suburb ? ` • ${selectedBusiness.suburb}` : ''
+                      }`
+                    : 'Add your first business'}
+                </p>
+              </Link>
+              <BusinessSelector />
+            </div>
+
+            <nav className="flex-1 p-4 space-y-6">
+              <SidebarNav items={mainNavItems} pathname={pathname} />
+              <SidebarInsights insights={aiInsights} loading={insightsLoading} />
+              <SidebarQuickStats stats={quickStats} loading={statsLoading} />
+            </nav>
+
+            <SidebarUserPanel user={user} pathname={pathname} onSignOut={handleSignOut} />
+          </aside>
 
       {/* Main content with responsive margins */}
           <main className="pt-16 lg:pt-0 lg:ml-64 min-h-screen overflow-auto">
@@ -457,6 +283,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </AnimatePresence>
           </main>
         </div>
+
+        {/* AI Chatbot - Fixed position, available on all dashboard pages */}
+        <AIChatbot />
+        </>
       )}
     </>
   )
