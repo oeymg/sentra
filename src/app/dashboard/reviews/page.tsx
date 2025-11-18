@@ -34,6 +34,7 @@ type Review = {
   sentiment: 'positive' | 'neutral' | 'negative' | null
   responded: boolean
   responseText: string | null
+  review_url: string | null
   platform: string
   platformIcon: string
 }
@@ -119,6 +120,7 @@ export default function ReviewsPage() {
             rating,
             review_text,
             reviewed_at,
+            review_url,
             sentiment,
             has_response,
             response_text,
@@ -152,6 +154,7 @@ export default function ReviewsPage() {
               sentiment: (review.sentiment as Review['sentiment']) ?? null,
               responded: review.has_response,
               responseText: review.response_text,
+              review_url: review.review_url ?? null,
               platform: platformMeta?.name ?? 'Unknown platform',
               platformIcon: PLATFORM_EMOJI[platformMeta?.slug ?? 'default'] ?? PLATFORM_EMOJI.default,
             }

@@ -26,6 +26,24 @@ export default function NewCampaignPage() {
     }
   }, [])
   const minScheduleDate = useMemo(() => new Date().toISOString().split('T')[0], [])
+  const timezoneOptions = useMemo<string[]>(() => {
+    const fallback = ['UTC', 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles']
+
+    try {
+      const intl = Intl as typeof Intl & { supportedValuesOf?: (input: string) => string[] }
+      if (typeof intl.supportedValuesOf === 'function') {
+        return intl.supportedValuesOf('timeZone')
+      }
+    } catch {
+      // Ignore and return fallback
+    }
+
+    if (defaultTimezone && !fallback.includes(defaultTimezone)) {
+      return [defaultTimezone, ...fallback]
+    }
+
+    return fallback
+  }, [defaultTimezone])
 
   const [formData, setFormData] = useState({
     name: '',
