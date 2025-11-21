@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import ScrollProgress from '@/components/ScrollProgress'
+import { generateSEO } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: 'Sentra - Centralized Review Management Platform',
-  description: 'AI-powered review management for SMEs',
-}
+export const metadata: Metadata = generateSEO({})
 
 export default function RootLayout({
   children,

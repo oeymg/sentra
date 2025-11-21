@@ -34,6 +34,16 @@ export default function Header() {
             Pricing
           </Link>
           <Link
+            href="/blog"
+            className={`text-sm transition-opacity ${
+              pathname?.startsWith('/blog')
+                ? 'text-black hover:opacity-60'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Blog
+          </Link>
+          <Link
             href="/auth/login"
             className="text-sm text-gray-600 hover:text-gray-900"
           >

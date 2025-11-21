@@ -27,7 +27,7 @@ export default function Home() {
 
   // AI response examples
   const aiResponses = {
-    professional: "Thank you for your feedback, Michael. We appreciate your positive remarks about our product quality. Regarding the delivery timeline, we're actively working on optimizing our shipping options and will be introducing expedited delivery choices soon.",
+    professional: "Thank you for your feedback, Michael. We appreciate your positive remarks about our product quality. Regarding the delivery timeline, we're actively working on optimising our shipping options and will be introducing expedited delivery choices soon.",
     friendly: "Hey Michael! Thanks so much for the kind words about the product - we're thrilled you love it! We totally hear you on the shipping speed. We're working on rolling out faster delivery options soon. Appreciate your patience!",
     apologetic: "We sincerely apologize for the delayed delivery, Michael. While we're glad the product met your expectations, the shipping timeline falls short of our standards. We're implementing faster shipping options and would love to offer you priority delivery on your next order."
   }
@@ -152,7 +152,7 @@ export default function Home() {
 
             <p className="text-xl text-black mb-10 max-w-xl font-light leading-relaxed animate-fadeIn" style={{ animationDelay: '0.1s' }}>
               Stop jumping between platforms. Sentra brings all your reviews together,
-              analyzes them with AI, and helps you respond—instantly.
+              analyses them with AI, and helps you respond—instantly.
             </p>
 
             {/* Stat callout */}
@@ -181,7 +181,7 @@ export default function Home() {
             <div className="mt-12 flex items-center gap-8 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-black">1,247 reviews analyzed today</span>
+                <span className="text-black">1,247 reviews analysed today</span>
               </div>
             </div>
           </div>
@@ -387,6 +387,166 @@ export default function Home() {
         </div>
       </section>
 
+      {/* AI Analysis Demo Section */}
+      <section className="py-32 px-6 bg-gradient-to-b from-gray-50 to-white relative">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full mb-6">
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-sm font-medium">Powered by AI</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-light mb-6 text-black">
+              AI that <span className="italic font-normal">understands your business</span>
+            </h2>
+            <p className="text-xl text-black max-w-2xl mx-auto font-light mb-6">
+              Analyse hundreds of reviews in seconds. Get actionable insights, spot trends, and discover what really matters to your customers.
+            </p>
+            <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200 rounded-full shadow-sm">
+              <BarChart3 className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-medium text-black">Turn feedback into growth with data-driven insights</span>
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Left: Sample Reviews Being Analysed */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <MessageSquare className="w-5 h-5 text-gray-600" />
+                <span className="text-sm font-medium text-gray-600">Sample Reviews (247 total)</span>
+              </div>
+
+              {[
+                { text: "Amazing service! The staff was incredibly helpful and the product exceeded my expectations.", sentiment: 'positive', category: 'Customer Service' },
+                { text: "Delivery was delayed by 3 days. Product is good but shipping needs improvement.", sentiment: 'mixed', category: 'Shipping' },
+                { text: "Love the quality! Best purchase I've made this year. Will definitely recommend.", sentiment: 'positive', category: 'Product Quality' },
+                { text: "Website was confusing to navigate. Checkout process could be smoother.", sentiment: 'negative', category: 'User Experience' },
+              ].map((review, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer group"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        review.sentiment === 'positive' ? 'bg-green-500' :
+                        review.sentiment === 'mixed' ? 'bg-yellow-500' :
+                        'bg-red-500'
+                      }`} />
+                      <span className="text-xs font-medium text-gray-500">{review.category}</span>
+                    </div>
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3 h-3 ${
+                            review.sentiment === 'positive' && i < 5 ? 'fill-yellow-400 text-yellow-400' :
+                            review.sentiment === 'mixed' && i < 3 ? 'fill-yellow-400 text-yellow-400' :
+                            review.sentiment === 'negative' && i < 2 ? 'fill-yellow-400 text-yellow-400' :
+                            'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed">{review.text}</p>
+                </div>
+              ))}
+
+              <div className="text-center py-4">
+                <span className="text-sm text-gray-500">+ 243 more reviews</span>
+              </div>
+            </div>
+
+            {/* Right: AI Analysis Results */}
+            <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-2xl p-8 shadow-xl relative overflow-hidden">
+              <div className="flex items-center gap-3 mb-6">
+                <Sparkles className="w-6 h-6 text-purple-600 animate-pulse" />
+                <span className="font-semibold text-lg text-black">AI Analysis Results</span>
+              </div>
+
+              {/* Sentiment Breakdown */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Sentiment Breakdown</h3>
+                <div className="space-y-2">
+                  {[
+                    { label: 'Positive', value: 68, color: 'bg-green-500' },
+                    { label: 'Neutral', value: 22, color: 'bg-yellow-500' },
+                    { label: 'Negative', value: 10, color: 'bg-red-500' },
+                  ].map((item) => (
+                    <div key={item.label}>
+                      <div className="flex items-center justify-between text-sm mb-1">
+                        <span className="text-gray-700">{item.label}</span>
+                        <span className="font-semibold text-black">{item.value}%</span>
+                      </div>
+                      <div className="h-2 bg-white/50 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${item.color} transition-all duration-1000`}
+                          style={{ width: `${item.value}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Key Themes */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Key Themes Detected</h3>
+                <div className="flex flex-wrap gap-2">
+                  {['Customer Service', 'Product Quality', 'Shipping', 'User Experience', 'Value for Money', 'Support'].map((theme) => (
+                    <span key={theme} className="px-3 py-1.5 bg-white/80 backdrop-blur-sm text-gray-700 text-xs font-medium rounded-full border border-purple-200">
+                      {theme}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actionable Insights */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-purple-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <h3 className="text-sm font-semibold text-black">Actionable Insights</h3>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { icon: '🚀', text: 'Customer service is your strongest asset—leverage it in marketing', priority: 'high' },
+                    { icon: '📦', text: 'Shipping delays mentioned in 18% of reviews—consider faster options', priority: 'medium' },
+                    { icon: '💻', text: 'Website UX feedback suggests checkout flow improvements needed', priority: 'medium' },
+                  ].map((insight, idx) => (
+                    <div key={idx} className="flex items-start gap-3 group">
+                      <span className="text-lg">{insight.icon}</span>
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-700 leading-relaxed">{insight.text}</p>
+                        <span className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded ${
+                          insight.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {insight.priority === 'high' ? 'High Priority' : 'Medium Priority'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Animated shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="mt-12 text-center">
+            <Link
+              href="/auth/signup"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-black text-white rounded-xl hover:bg-gray-800 transition-all font-medium shadow-lg"
+            >
+              <Sparkles className="w-5 h-5" />
+              <span>See Your Insights</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Platform Integration Visual */}
       <section className="py-32 px-6 border-y border-black/10 relative overflow-hidden">
         <div className="max-w-5xl mx-auto">
@@ -468,7 +628,7 @@ export default function Home() {
 
       {/* Features with icons */}
       <section className="py-32 px-6 relative">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-12">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {[
             {
               icon: MessageSquare,
@@ -487,9 +647,17 @@ export default function Home() {
               bgColor: 'bg-purple-50'
             },
             {
+              icon: TrendingUp,
+              title: 'Smart Improvements',
+              description: 'AI analyses your reviews to suggest actionable improvements for your business operations.',
+              stat: 'Data-driven growth insights',
+              color: 'text-green-600',
+              bgColor: 'bg-green-50'
+            },
+            {
               icon: Zap,
               title: 'Instant Responses',
-              description: 'AI drafts personalized replies in seconds. Choose your tone, review, and post.',
+              description: 'AI drafts personalised replies in seconds. Choose your tone, review, and post.',
               stat: 'Respond 10x faster with AI',
               color: 'text-orange-600',
               bgColor: 'bg-orange-50'

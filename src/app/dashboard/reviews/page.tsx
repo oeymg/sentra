@@ -441,7 +441,7 @@ export default function ReviewsPage() {
                 <input
                   type="text"
                   placeholder="Search by name, platform, or keywords..."
-                  className="outline-none text-sm bg-transparent w-64"
+                  className="outline-none text-sm bg-transparent w-64 placeholder:text-black"
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
                   disabled={loadingReviews}
@@ -733,7 +733,7 @@ function ReviewCard({
           ))}
         </div>
       </div>
-      <p className="text-gray-700 leading-relaxed mb-4">{review.text || 'No review text provided.'}</p>
+      <p className="text-black leading-relaxed mb-4">{review.text || 'No review text provided.'}</p>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="text-xs uppercase tracking-widest">
           {review.sentiment === 'negative' ? (
@@ -750,7 +750,7 @@ function ReviewCard({
           ) : (
             <button
               onClick={onGenerate}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm text-black hover:bg-gray-50"
             >
               {isGenerating ? (
                 <>
@@ -881,7 +881,7 @@ function AIResponseModal({
               value={aiResponse}
               onChange={(event) => onChangeResponse(event.target.value)}
               rows={5}
-              className="w-full border border-gray-200 rounded-xl p-4 text-gray-700 focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full border border-gray-200 rounded-xl p-4 text-black focus:ring-2 focus:ring-black focus:border-transparent placeholder:text-black"
               placeholder="Edit the AI suggestion before posting..."
             />
 
