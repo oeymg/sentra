@@ -29,15 +29,47 @@ export default function Onboarding() {
         return
       }
 
+      // Generate slug from business name
+      let slug = formData.businessName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+
+      // Fallback to a unique slug if empty
+      if (!slug) {
+        slug = `business-${Date.now()}`
+      }
+
       const { error } = await supabase.from('businesses').insert({
         user_id: user.id,
         name: formData.businessName,
+        slug,
         industry: formData.industry,
         website: formData.website,
-        description: formData.description
+        description: formData.description,
+        plan_tier: 'free',
+        subscription_status: 'active',
       })
 
-      if (error) throw error
+      if (error) {
+        // If slug already exists, retry with a unique suffix
+        if (error.code === '23505') {
+          const uniqueSlug = `${slug}-${Date.now()}`
+          const { error: retryError } = await supabase.from('businesses').insert({
+            user_id: user.id,
+            name: formData.businessName,
+            slug: uniqueSlug,
+            industry: formData.industry,
+            website: formData.website,
+            description: formData.description,
+            plan_tier: 'free',
+            subscription_status: 'active',
+          })
+          if (retryError) throw retryError
+        } else {
+          throw error
+        }
+      }
 
       router.push('/dashboard')
     } catch (err: any) {

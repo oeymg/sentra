@@ -29,16 +29,49 @@ export default function AddBusinessModal({ userId, isOpen, onClose, onSuccess }:
     setLoading(true)
 
     try {
+      // Generate slug from business name
+      let slug = formData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+
+      // Fallback to a unique slug if empty
+      if (!slug) {
+        slug = `business-${Date.now()}`
+      }
+
       const { error } = await supabase.from('businesses').insert({
         user_id: userId,
         name: formData.name,
+        slug,
         industry: formData.industry,
         website: formData.website || null,
         description: formData.description || null,
         address: formData.address || null,
+        plan_tier: 'free',
+        subscription_status: 'active',
       })
 
-      if (error) throw error
+      if (error) {
+        // If slug already exists, retry with a unique suffix
+        if (error.code === '23505') {
+          const uniqueSlug = `${slug}-${Date.now()}`
+          const { error: retryError } = await supabase.from('businesses').insert({
+            user_id: userId,
+            name: formData.name,
+            slug: uniqueSlug,
+            industry: formData.industry,
+            website: formData.website || null,
+            description: formData.description || null,
+            address: formData.address || null,
+            plan_tier: 'free',
+            subscription_status: 'active',
+          })
+          if (retryError) throw retryError
+        } else {
+          throw error
+        }
+      }
 
       // Reset form
       setFormData({ name: '', industry: '', website: '', description: '', address: '' })

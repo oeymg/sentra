@@ -14,7 +14,8 @@
       "Bash(npm run build:*)",
       "Bash(curl:*)",
       "Bash(git log:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(npx supabase db reset)"
     ],
     "deny": [],
     "ask": []
