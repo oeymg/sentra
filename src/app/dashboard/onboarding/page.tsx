@@ -29,6 +29,28 @@ export default function Onboarding() {
         return
       }
 
+      // Ensure profile exists before creating business
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError || !profile) {
+        // Create profile if it doesn't exist
+        const { error: createProfileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || null,
+          })
+
+        if (createProfileError && createProfileError.code !== '23505') {
+          throw new Error(`Failed to create profile: ${createProfileError.message}`)
+        }
+      }
+
       // Generate slug from business name
       let slug = formData.businessName
         .toLowerCase()

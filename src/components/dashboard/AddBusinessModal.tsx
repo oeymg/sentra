@@ -29,6 +29,33 @@ export default function AddBusinessModal({ userId, isOpen, onClose, onSuccess }:
     setLoading(true)
 
     try {
+      // Ensure profile exists before creating business
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', userId)
+        .single()
+
+      if (profileError || !profile) {
+        // Get user email for profile creation
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (user) {
+          // Create profile if it doesn't exist
+          const { error: createProfileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: userId,
+              email: user.email || '',
+              full_name: user.user_metadata?.full_name || null,
+            })
+
+          if (createProfileError && createProfileError.code !== '23505') {
+            throw new Error(`Failed to create profile: ${createProfileError.message}`)
+          }
+        }
+      }
+
       // Generate slug from business name
       let slug = formData.name
         .toLowerCase()
