@@ -96,7 +96,9 @@ export async function canGenerateAIResponse(businessId: string): Promise<{
     }
   }
 
-  const limits = PLAN_LIMITS[business.plan_tier]
+  // Ensure plan_tier is valid
+  const planTier = (business.plan_tier || 'free') as PlanTier
+  const limits = PLAN_LIMITS[planTier]
 
   // For unlimited plans (Pro and Enterprise)
   if (limits.aiResponsesPerMonth === 'unlimited') {
@@ -105,7 +107,7 @@ export async function canGenerateAIResponse(businessId: string): Promise<{
 
   // For free plan, check monthly limit
   const used = business.ai_responses_used_this_month
-  const remaining = limits.aiResponsesPerMonth - used
+  const remaining = (limits.aiResponsesPerMonth as number) - used
 
   if (remaining <= 0) {
     return {

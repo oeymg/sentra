@@ -89,7 +89,7 @@ export function SidebarPlanCard() {
         </div>
 
         {/* AI Responses Usage */}
-        {isFreePlan && (
+        {isFreePlan && typeof aiResponsesLimit === 'number' && (
           <div>
             <div className="flex items-baseline justify-between mb-1">
               <span className="text-xs text-gray-600">AI Responses</span>
@@ -107,7 +107,7 @@ export function SidebarPlanCard() {
                     : 'bg-blue-600'
                 }`}
                 style={{
-                  width: `${Math.min(100, (aiResponsesUsed / (aiResponsesLimit as number)) * 100)}%`,
+                  width: `${Math.min(100, (aiResponsesUsed / aiResponsesLimit) * 100)}%`,
                 }}
               />
             </div>
