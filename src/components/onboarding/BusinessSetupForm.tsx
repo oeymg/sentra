@@ -38,10 +38,15 @@ export default function BusinessSetupForm({ user, planTier }: BusinessSetupFormP
 
     try {
       // Generate slug from business name
-      const slug = formData.businessName
+      let slug = formData.businessName
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '')
+
+      // Fallback to a unique slug if empty
+      if (!slug) {
+        slug = `business-${Date.now()}`
+      }
 
       // Calculate trial end date for Pro plan (14 days from now)
       const trialEndsAt = planTier === 'pro'
@@ -67,20 +72,40 @@ export default function BusinessSetupForm({ user, planTier }: BusinessSetupFormP
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        // If slug already exists, retry with a unique suffix
+        if (error.code === '23505') {
+          const uniqueSlug = `${slug}-${Date.now()}`
+          const { data: retryBusiness, error: retryError } = await supabase
+            .from('businesses')
+            .insert({
+              user_id: user.id,
+              name: formData.businessName,
+              slug: uniqueSlug,
+              industry: formData.industry,
+              website: formData.website || null,
+              address: formData.location || null,
+              description: formData.location ? `Located in ${formData.location}` : null,
+              plan_tier: planTier,
+              subscription_status: planTier === 'pro' ? 'trial' : 'active',
+              trial_ends_at: trialEndsAt,
+              plan_started_at: new Date().toISOString(),
+            })
+            .select()
+            .single()
+
+          if (retryError) throw retryError
+        } else {
+          throw error
+        }
+      }
 
       // Redirect to dashboard
       router.push('/dashboard')
       router.refresh()
     } catch (error: any) {
       console.error('Error creating business:', error)
-
-      // If slug already exists, try with a random suffix
-      if (error.code === '23505') {
-        alert('A business with this name already exists. Please try a different name.')
-      } else {
-        alert('Failed to create business. Please try again.')
-      }
+      alert(`Failed to create business: ${error.message || 'Please try again.'}`)
     } finally {
       setLoading(false)
     }
