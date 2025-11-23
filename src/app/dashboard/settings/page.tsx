@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { createClient } from '@/lib/supabase/client'
-import { User, Building2, Bell, Key, MessageSquare, AlertTriangle } from 'lucide-react'
+import { User, Building2, Bell, Key, MessageSquare, AlertTriangle, CreditCard, Sparkles, Zap, Crown, Clock, Check, ArrowRight } from 'lucide-react'
 import { responseTemplates } from '@/lib/analytics'
 import { useBusinessContext } from '@/contexts/BusinessContext'
+import { getPlanDisplayName, getPlanPrice, getDaysRemainingInTrial } from '@/lib/plans'
 
 export default function Settings() {
   const router = useRouter()
@@ -382,6 +384,7 @@ export default function Settings() {
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'business', label: 'Business', icon: Building2 },
+    { id: 'plan', label: 'Plan & Billing', icon: CreditCard },
     { id: 'templates', label: 'Response Templates', icon: MessageSquare },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'security', label: 'Security', icon: Key },
@@ -632,6 +635,203 @@ export default function Settings() {
                   {loading ? 'Saving...' : 'Save Changes'}
                 </button>
               </form>
+            </div>
+          )}
+
+          {/* Plan & Billing Tab */}
+          {activeTab === 'plan' && (
+            <div className="space-y-8">
+              {/* Current Plan Card */}
+              <div className="border border-black p-8">
+                <h2 className="text-2xl font-light mb-6 text-black">Current Plan</h2>
+
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-4xl font-light text-black">
+                        {getPlanDisplayName(selectedBusiness?.plan_tier || 'free')}
+                      </span>
+                      {selectedBusiness?.subscription_status === 'trial' && selectedBusiness?.trial_ends_at && (
+                        <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                          Trial
+                        </span>
+                      )}
+                    </div>
+                    {selectedBusiness?.subscription_status === 'trial' && selectedBusiness?.trial_ends_at && (
+                      <p className="text-sm text-gray-600 flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        {getDaysRemainingInTrial(selectedBusiness.trial_ends_at)} days remaining
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-3xl font-light text-black">
+                      {getPlanPrice(selectedBusiness?.plan_tier || 'free')}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {(selectedBusiness?.plan_tier || 'free') === 'free' ? 'forever' : 'per month'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Usage Stats for Free Plan */}
+                {(selectedBusiness?.plan_tier || 'free') === 'free' && (
+                  <div className="mb-6 p-4 bg-gray-50 rounded border border-gray-200">
+                    <div className="flex items-baseline justify-between mb-2">
+                      <span className="text-sm text-gray-600">AI Responses This Month</span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {selectedBusiness?.ai_responses_used_this_month || 0} / 5
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all ${
+                          (selectedBusiness?.ai_responses_used_this_month || 0) >= 5
+                            ? 'bg-red-500'
+                            : (selectedBusiness?.ai_responses_used_this_month || 0) >= 4
+                            ? 'bg-yellow-500'
+                            : 'bg-blue-600'
+                        }`}
+                        style={{
+                          width: `${Math.min(100, ((selectedBusiness?.ai_responses_used_this_month || 0) / 5) * 100)}%`,
+                        }}
+                      />
+                    </div>
+                    {(selectedBusiness?.ai_responses_used_this_month || 0) >= 5 && (
+                      <p className="text-sm text-red-600 mt-2">
+                        Monthly limit reached. Upgrade to Pro for unlimited AI responses.
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Trial Info */}
+                {selectedBusiness?.subscription_status === 'trial' && selectedBusiness?.trial_ends_at && (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded">
+                    <p className="text-sm font-medium text-blue-900 mb-1">
+                      Your Pro trial ends in {getDaysRemainingInTrial(selectedBusiness.trial_ends_at)} days
+                    </p>
+                    <p className="text-sm text-blue-700">
+                      Add payment details to continue using Pro features after your trial ends.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Available Plans */}
+              <div>
+                <h2 className="text-2xl font-light mb-6 text-black">
+                  {(selectedBusiness?.plan_tier || 'free') === 'free' ? 'Upgrade Your Plan' : 'Change Plan'}
+                </h2>
+
+                <div className="grid md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      id: 'free',
+                      name: 'Free',
+                      price: '$0',
+                      period: 'forever',
+                      icon: Sparkles,
+                      features: ['1 location', 'All review platforms', '5 AI responses per month', 'Basic analytics'],
+                    },
+                    {
+                      id: 'pro',
+                      name: 'Pro',
+                      price: '$29.99',
+                      period: 'per month',
+                      icon: Zap,
+                      popular: true,
+                      features: ['1 location', 'Unlimited AI responses', 'Review generation campaigns', 'Email & SMS automation', 'Advanced analytics'],
+                    },
+                    {
+                      id: 'enterprise',
+                      name: 'Enterprise',
+                      price: 'Custom',
+                      period: 'pricing',
+                      icon: Crown,
+                      features: ['Unlimited locations', 'Everything in Pro', 'Auto-reply automation', 'White-label reports', 'API access', 'Priority support'],
+                    },
+                  ].map((plan) => {
+                    const PlanIcon = plan.icon
+                    const isCurrent = plan.id === (selectedBusiness?.plan_tier || 'free')
+                    const canUpgrade = ((selectedBusiness?.plan_tier || 'free') === 'free' && plan.id !== 'free') ||
+                                     ((selectedBusiness?.plan_tier || 'free') === 'pro' && plan.id === 'enterprise')
+
+                    return (
+                      <div
+                        key={plan.id}
+                        className={`relative border-2 rounded p-6 transition-all ${
+                          isCurrent
+                            ? 'border-black bg-gray-50'
+                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                        } ${plan.popular ? 'ring-2 ring-blue-100' : ''}`}
+                      >
+                        {plan.popular && !isCurrent && (
+                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-black text-white text-xs font-medium rounded-full">
+                            Most Popular
+                          </div>
+                        )}
+
+                        {isCurrent && (
+                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-black text-white text-xs font-medium rounded-full">
+                            Current Plan
+                          </div>
+                        )}
+
+                        <div className="mb-4">
+                          <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center mb-3">
+                            <PlanIcon className="w-5 h-5 text-black" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-black mb-2">{plan.name}</h3>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-light text-black">{plan.price}</span>
+                            <span className="text-gray-600 text-xs">/ {plan.period}</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 mb-4">
+                          {plan.features.map((feature, idx) => (
+                            <div key={idx} className="flex items-start gap-2">
+                              <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                              <span className="text-sm text-gray-700">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {isCurrent ? (
+                          <button
+                            disabled
+                            className="w-full py-2 bg-gray-100 text-gray-600 rounded text-sm font-medium cursor-not-allowed"
+                          >
+                            Current Plan
+                          </button>
+                        ) : canUpgrade ? (
+                          <Link
+                            href={plan.id === 'enterprise' ? '/contact-sales' : '/onboarding/payment?plan=' + plan.id}
+                            className="block w-full text-center py-2 bg-black text-white rounded text-sm font-medium hover:bg-gray-800 transition-colors"
+                          >
+                            Upgrade to {plan.name}
+                          </Link>
+                        ) : null}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Billing Information (if not on free plan) */}
+              {(selectedBusiness?.plan_tier || 'free') !== 'free' && (
+                <div className="border border-black p-8">
+                  <h2 className="text-2xl font-light mb-6 text-black">Billing Information</h2>
+
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 mb-4">Payment integration coming soon</p>
+                    <p className="text-sm text-gray-500">
+                      Stripe integration will be added here for payment management
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

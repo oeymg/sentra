@@ -56,6 +56,18 @@ create table public.businesses (
   google_place_id text,
   yelp_business_id text,
   tripadvisor_url text,
+
+  -- Pricing tier fields
+  plan_tier text not null default 'free' check (plan_tier in ('free', 'pro', 'enterprise')),
+  subscription_status text not null default 'active' check (subscription_status in ('active', 'trial', 'cancelled', 'expired', 'past_due')),
+  subscription_id text,
+  stripe_customer_id text,
+  plan_started_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  plan_expires_at timestamp with time zone,
+  trial_ends_at timestamp with time zone,
+  ai_responses_used_this_month integer default 0 not null,
+  ai_responses_reset_at timestamp with time zone default timezone('utc'::text, now()) not null,
+
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -255,6 +267,8 @@ create policy "Users can view analytics for own businesses"
 
 -- Create indexes for better performance
 create index idx_businesses_user_id on public.businesses(user_id);
+create index idx_businesses_plan_tier on public.businesses(plan_tier);
+create index idx_businesses_subscription_status on public.businesses(subscription_status);
 create index idx_business_platforms_business_id on public.business_platforms(business_id);
 create index idx_reviews_business_id on public.reviews(business_id);
 create index idx_reviews_platform_id on public.reviews(platform_id);

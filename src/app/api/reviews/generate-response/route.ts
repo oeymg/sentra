@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { generateMultipleResponses } from '@/lib/ai/claude'
 import { NextRequest, NextResponse } from 'next/server'
+import { canGenerateAIResponse, incrementAIResponseUsage } from '@/lib/plans'
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +22,14 @@ export async function POST(request: NextRequest) {
       .select(
         `
         *,
-        businesses!inner(user_id, name)
+        businesses!inner(
+          user_id,
+          name,
+          id,
+          plan_tier,
+          subscription_status,
+          ai_responses_used_this_month
+        )
       `
       )
       .eq('id', reviewId)
@@ -34,6 +42,20 @@ export async function POST(request: NextRequest) {
     // Check authorization
     if (review.businesses.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Check if business can generate AI response (plan limits)
+    const { allowed, reason, remaining } = await canGenerateAIResponse(review.businesses.id)
+
+    if (!allowed) {
+      return NextResponse.json(
+        {
+          error: reason || 'Cannot generate AI response',
+          limitReached: true,
+          planTier: review.businesses.plan_tier,
+        },
+        { status: 403 }
+      )
     }
 
     // Generate multiple response suggestions
@@ -59,7 +81,14 @@ export async function POST(request: NextRequest) {
       console.error('Failed to save AI responses:', insertError)
     }
 
-    return NextResponse.json({ success: true, responses })
+    // Increment AI response usage counter
+    await incrementAIResponseUsage(review.businesses.id)
+
+    return NextResponse.json({
+      success: true,
+      responses,
+      remaining: remaining !== undefined ? remaining - 1 : undefined,
+    })
   } catch (error) {
     console.error('Error generating responses:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

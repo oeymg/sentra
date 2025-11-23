@@ -65,19 +65,19 @@ export default function Pricing() {
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>Up to 3 platforms</span>
+                <span>All review platforms</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>100 reviews per month</span>
+                <span>Unlimited review monitoring</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>Basic AI analysis</span>
+                <span>5 AI responses per month</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>AI response suggestions</span>
+                <span>Basic analytics</span>
               </div>
             </div>
           </div>
@@ -88,18 +88,26 @@ export default function Pricing() {
               Most popular
             </div>
             <div className="text-sm uppercase tracking-widest mb-4">Pro</div>
-            <div className="text-2xl font-light mb-6 uppercase tracking-[0.4em] text-white/70">Coming soon</div>
-            <div className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 border border-white text-white/60 cursor-not-allowed mb-10 uppercase tracking-[0.4em]">
-              Coming soon
+            <div className="text-6xl font-light mb-2">$29.99</div>
+            <div className="text-sm mb-4">Per month</div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-lg mb-6">
+              <Clock className="w-4 h-4 text-white" />
+              <span className="text-sm font-semibold text-white">14-day free trial</span>
             </div>
+            <Link
+              href="/auth/signup"
+              className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black hover:bg-gray-100 transition-all mb-10"
+            >
+              Start Pro trial
+            </Link>
             <div className="space-y-4 font-light">
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>Up to 5 business locations</span>
+                <span>1 business location</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>All 20+ platforms</span>
+                <span>All review platforms</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
@@ -107,34 +115,48 @@ export default function Pricing() {
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>Advanced AI analysis</span>
+                <span>Unlimited AI responses</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>Auto-reply automation</span>
+                <span>Review generation campaigns</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>Sentiment trends & reports</span>
+                <span>Email & SMS automation</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>Priority support</span>
+                <span>QR code generator</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <span>Advanced analytics</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <span>Competitor tracking</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <span>Custom alerts</span>
               </div>
             </div>
           </div>
 
           {/* Enterprise */}
           <div className="border border-black p-10 group hover:shadow-xl transition-all duration-300">
-            <div className="text-sm uppercase tracking-widest mb-4 text-black">Coming soon</div>
+            <div className="text-sm uppercase tracking-widest mb-4 text-black">Enterprise</div>
             <div className="text-6xl font-light mb-2 text-black">Custom</div>
-            <div className="text-sm text-black mb-8">Let's talk</div>
+            <div className="text-sm text-black mb-4">Pricing</div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg mb-6">
+              <span className="text-sm font-semibold text-purple-700">For multi-location businesses</span>
+            </div>
             <Link
-              href="/auth/signup"
-              className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 border border-black text-black cursor-not-allowed opacity-70 mb-10"
-              aria-disabled
+              href="/contact-sales"
+              className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-white border border-black text-black hover:bg-black hover:text-white transition-all mb-10"
             >
-              Coming soon
+              Contact sales
             </Link>
             <div className="space-y-4 text-black font-light">
               <div className="flex items-start gap-3">
@@ -143,27 +165,35 @@ export default function Pricing() {
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>All platforms + custom integrations</span>
+                <span>Everything in Pro</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>Unlimited everything</span>
+                <span>Auto-reply automation</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>Custom AI model training</span>
+                <span>White-label reports</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>White-label options</span>
+                <span>API access</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <span>Team management</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <span>Priority support</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <span>Custom integrations</span>
               </div>
               <div className="flex items-start gap-3">
                 <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <span>Dedicated account manager</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>SLA & 24/7 support</span>
               </div>
             </div>
           </div>
@@ -176,27 +206,33 @@ export default function Pricing() {
           <h2 className="text-5xl font-light mb-16 text-black">Questions?</h2>
           <div className="space-y-12">
             <div>
-              <h3 className="text-2xl font-light mb-4 text-black">Can I change plans later?</h3>
-              <p className="text-xl font-light text-black leading-relaxed">
-                Yes. Upgrade or downgrade anytime. Changes take effect immediately, and we'll prorate the difference.
-              </p>
-            </div>
-            <div>
               <h3 className="text-2xl font-light mb-4 text-black">Is the free plan really free forever?</h3>
               <p className="text-xl font-light text-black leading-relaxed">
-                Yes. No credit card required, no trial period, no catch. It's free forever.
+                Yes. No credit card required, no trial period, no catch. Start with 5 AI responses per month and upgrade when you need more.
               </p>
             </div>
             <div>
-              <h3 className="text-2xl font-light mb-4 text-black">What if I exceed my plan limits?</h3>
+              <h3 className="text-2xl font-light mb-4 text-black">What happens after the Pro trial?</h3>
               <p className="text-xl font-light text-black leading-relaxed">
-                We'll notify you before you hit limits. You can upgrade anytime, or we'll pause syncing until next month.
+                After your 14-day Pro trial, you'll be asked to enter payment details to continue with Pro, or you can downgrade to the Free plan.
               </p>
             </div>
             <div>
-              <h3 className="text-2xl font-light mb-4 text-black">Do you offer annual billing?</h3>
+              <h3 className="text-2xl font-light mb-4 text-black">Can I switch plans later?</h3>
               <p className="text-xl font-light text-black leading-relaxed">
-                Yes! Pay annually and save 20%. Contact us for annual plans.
+                Yes. Upgrade or downgrade anytime from your dashboard settings. Changes take effect immediately.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-2xl font-light mb-4 text-black">What's the difference between Free and Pro?</h3>
+              <p className="text-xl font-light text-black leading-relaxed">
+                Free gives you 5 AI responses per month and basic features. Pro unlocks unlimited AI responses, review generation campaigns (email/SMS/QR codes), and advanced analytics.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-2xl font-light mb-4 text-black">When should I consider Enterprise?</h3>
+              <p className="text-xl font-light text-black leading-relaxed">
+                If you have multiple business locations or need white-label reports, API access, and dedicated support, Enterprise is for you. Contact our sales team for custom pricing.
               </p>
             </div>
           </div>

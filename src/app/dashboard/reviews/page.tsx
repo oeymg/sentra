@@ -258,6 +258,21 @@ export default function ReviewsPage() {
       })
 
       const payload = await response.json()
+
+      // Check if limit is reached
+      if (payload.limitReached) {
+        const isFreePlan = payload.planTier === 'free'
+        const errorMessage = isFreePlan
+          ? `You've reached your monthly limit of 5 AI responses on the Free plan. Upgrade to Pro for unlimited AI responses, plus review generation campaigns and advanced analytics.`
+          : payload.error
+
+        setModalError(errorMessage)
+        setSelectedReview(review)
+        setShowAIModal(true)
+        setGenerating(false)
+        return
+      }
+
       if (!response.ok) {
         throw new Error(payload.error || 'Failed to generate suggestions.')
       }
@@ -860,7 +875,17 @@ function AIResponseModal({
             </div>
 
             {modalError && (
-              <div className="mb-4 text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg p-3">{modalError}</div>
+              <div className="mb-4 bg-red-50 border border-red-100 rounded-lg p-4">
+                <p className="text-sm text-red-700 mb-3">{modalError}</p>
+                {modalError.includes('Upgrade') && (
+                  <a
+                    href="/onboarding/plan-selection"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+                  >
+                    Upgrade to Pro →
+                  </a>
+                )}
+              </div>
             )}
 
             {aiSuggestions.length > 1 && (

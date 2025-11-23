@@ -9,6 +9,10 @@ type Business = {
   slug: string
   suburb: string | null
   googlePlaceId: string | null
+  plan_tier?: 'free' | 'pro' | 'enterprise'
+  subscription_status?: string
+  ai_responses_used_this_month?: number
+  trial_ends_at?: string | null
 }
 
 type BusinessContextType = {
@@ -47,7 +51,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
 
       const { data } = await supabase
         .from('businesses')
-        .select('id,name,slug,address,google_place_id')
+        .select('id,name,slug,address,google_place_id,plan_tier,subscription_status,ai_responses_used_this_month,trial_ends_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true })
 
@@ -58,6 +62,10 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
           slug: biz.slug || biz.id, // Fallback to ID if slug doesn't exist
           suburb: extractSuburb(biz.address),
           googlePlaceId: biz.google_place_id ?? null,
+          plan_tier: biz.plan_tier,
+          subscription_status: biz.subscription_status,
+          ai_responses_used_this_month: biz.ai_responses_used_this_month,
+          trial_ends_at: biz.trial_ends_at,
         })) ?? []
 
       setBusinesses(bizList)

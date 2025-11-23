@@ -14,6 +14,7 @@ import { BusinessSelector } from '@/components/dashboard/BusinessSelector'
 import { SidebarNav } from '@/components/dashboard/sidebar/SidebarNav'
 import { SidebarInsights } from '@/components/dashboard/sidebar/SidebarInsights'
 import { SidebarQuickStats } from '@/components/dashboard/sidebar/SidebarQuickStats'
+import { SidebarPlanCard } from '@/components/dashboard/sidebar/SidebarPlanCard'
 import { SidebarUserPanel } from '@/components/dashboard/sidebar/SidebarUserPanel'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -265,6 +266,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <SidebarQuickStats stats={quickStats} loading={statsLoading} />
             </nav>
 
+            <SidebarPlanCard />
             <SidebarUserPanel user={user} pathname={pathname} onSignOut={handleSignOut} />
           </aside>
 
