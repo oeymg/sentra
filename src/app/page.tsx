@@ -171,10 +171,18 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               </Link>
 
-              <div className="flex items-center gap-2 text-sm text-black">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>No credit card required</span>
-              </div>
+              <Link
+                href="/book-demo"
+                className="inline-flex items-center gap-3 text-base px-10 py-5 bg-white text-black border-2 border-black hover:bg-black hover:text-white transition-all group shadow-lg hover:shadow-2xl"
+              >
+                <span className="relative z-10">Book a demo</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-black mt-4">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>No credit card required</span>
             </div>
 
             {/* Live stats ticker */}

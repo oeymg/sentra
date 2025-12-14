@@ -153,10 +153,10 @@ export default function Pricing() {
               <span className="text-sm font-semibold text-purple-700">For multi-location businesses</span>
             </div>
             <Link
-              href="/contact-sales"
+              href="/book-demo"
               className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-white border border-black text-black hover:bg-black hover:text-white transition-all mb-10"
             >
-              Contact sales
+              Book a demo
             </Link>
             <div className="space-y-4 text-black font-light">
               <div className="flex items-start gap-3">

@@ -24,6 +24,7 @@
     "@upstash/redis": "^1.35.6",
     "autoprefixer": "^10.4.21",
     "canvas-confetti": "^1.9.4",
+    "cls-bluebird": "^2.1.0",
     "date-fns": "^4.1.0",
     "eslint": "^9.39.1",
     "eslint-config-next": "^16.0.1",
@@ -45,6 +46,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@types/canvas-confetti": "^1.9.0"
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/snoowrap": "^1.16.1"
   }
 }

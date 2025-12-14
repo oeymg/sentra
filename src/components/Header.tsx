@@ -50,10 +50,10 @@ export default function Header() {
             Sign in
           </Link>
           <Link
-            href="/auth/signup"
+            href="/book-demo"
             className="text-sm px-5 py-2 bg-black text-white hover:bg-gray-800 transition-colors"
           >
-            Get started
+            Book a demo
           </Link>
         </div>
       </div>
