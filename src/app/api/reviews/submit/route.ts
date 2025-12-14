@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const { businessId, rating, text, reviewerName, reviewerEmail, source } = await request.json()
+    const { businessId, rating, text, reviewerName, reviewerEmail, source, mediaUrls, mediaTypes } = await request.json()
 
     // Validation
     if (!businessId || !rating || !text || !reviewerName) {
@@ -36,17 +36,48 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Get or create the platform for direct reviews
+    const platformSlug = source || 'direct'
+    const { data: platform } = await supabase
+      .from('review_platforms')
+      .select('id')
+      .eq('slug', platformSlug)
+      .single()
+
+    // If platform doesn't exist, create it (fallback to first available platform)
+    let platformId = platform?.id
+    if (!platformId) {
+      // Get any platform as fallback (should have 'direct' platform in seed data)
+      const { data: anyPlatform } = await supabase
+        .from('review_platforms')
+        .select('id')
+        .limit(1)
+        .single()
+
+      platformId = anyPlatform?.id
+    }
+
+    if (!platformId) {
+      return NextResponse.json(
+        { error: 'No review platform configured' },
+        { status: 500 }
+      )
+    }
+
     // Create the review
-    const { data: review, error: reviewError } = await supabase
+    const { data: review, error: reviewError} = await supabase
       .from('reviews')
       .insert({
         business_id: businessId,
-        platform: source || 'direct',
+        platform_id: platformId,
+        platform_review_id: `direct_${Date.now()}`,
         rating,
-        text,
+        review_text: text,
         reviewer_name: reviewerName,
-        reviewer_email: reviewerEmail,
-        source_id: `direct_${Date.now()}`,
+        reviewed_at: new Date().toISOString(),
+        media_urls: mediaUrls || null,
+        media_types: mediaTypes || null,
+        has_media: !!(mediaUrls && mediaUrls.length > 0),
         created_at: new Date().toISOString(),
       })
       .select()
