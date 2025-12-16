@@ -9,6 +9,7 @@ import { User, Building2, Bell, Key, MessageSquare, AlertTriangle, CreditCard, S
 import { responseTemplates } from '@/lib/analytics'
 import { useBusinessContext } from '@/contexts/BusinessContext'
 import { getPlanDisplayName, getPlanPrice, getDaysRemainingInTrial } from '@/lib/plans'
+import { INDUSTRY_OPTIONS } from '@/lib/constants/industries'
 
 export default function Settings() {
   const router = useRouter()
@@ -490,18 +491,11 @@ export default function Settings() {
                     className="w-full px-4 py-3 border border-gray-300 text-black focus:outline-none focus:border-black transition-colors"
                   >
                     <option value="">Select an industry</option>
-                    <option value="property">Real Estate & Property Development</option>
-                    <option value="construction">Construction & Building</option>
-                    <option value="professional">Professional Services</option>
-                    <option value="home">Home Services</option>
-                    <option value="retail">Retail & E-commerce</option>
-                    <option value="hospitality">Hospitality & Travel</option>
-                    <option value="healthcare">Healthcare</option>
-                    <option value="automotive">Automotive</option>
-                    <option value="beauty">Beauty & Wellness</option>
-                    <option value="education">Education</option>
-                    <option value="technology">Technology</option>
-                    <option value="other">Other</option>
+                    {INDUSTRY_OPTIONS.map((industry) => (
+                      <option key={industry} value={industry}>
+                        {industry}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

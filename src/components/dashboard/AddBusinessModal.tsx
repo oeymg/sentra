@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { X, Building2, Globe, MapPin, Briefcase, FileText } from 'lucide-react'
+import { INDUSTRY_OPTIONS } from '@/lib/constants/industries'
 
 interface AddBusinessModalProps {
   userId: string
@@ -155,19 +156,11 @@ export default function AddBusinessModal({ userId, isOpen, onClose, onSuccess }:
               required
             >
               <option value="">Select industry</option>
-              <option value="Restaurant">Restaurant</option>
-              <option value="Retail">Retail</option>
-              <option value="Healthcare">Healthcare</option>
-              <option value="Professional Services">Professional Services</option>
-              <option value="Home Services">Home Services</option>
-              <option value="Hospitality">Hospitality</option>
-              <option value="Beauty & Wellness">Beauty & Wellness</option>
-              <option value="Automotive">Automotive</option>
-              <option value="Real Estate">Real Estate</option>
-              <option value="E-commerce">E-commerce</option>
-              <option value="Technology">Technology</option>
-              <option value="Education">Education</option>
-              <option value="Other">Other</option>
+              {INDUSTRY_OPTIONS.map((industry) => (
+                <option key={industry} value={industry}>
+                  {industry}
+                </option>
+              ))}
             </select>
           </div>
 

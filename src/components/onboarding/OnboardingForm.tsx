@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { Building2, MapPin, Globe, Briefcase, ArrowRight } from 'lucide-react'
+import { INDUSTRY_OPTIONS } from '@/lib/constants/industries'
 
 interface OnboardingFormProps {
   user: User
@@ -125,16 +126,11 @@ export default function OnboardingForm({ user }: OnboardingFormProps) {
                     required
                   >
                     <option value="">Select industry</option>
-                    <option value="Restaurant">Restaurant</option>
-                    <option value="Retail">Retail</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Professional Services">Professional Services</option>
-                    <option value="Home Services">Home Services</option>
-                    <option value="Hospitality">Hospitality</option>
-                    <option value="Beauty & Wellness">Beauty & Wellness</option>
-                    <option value="Automotive">Automotive</option>
-                    <option value="Real Estate">Real Estate</option>
-                    <option value="Other">Other</option>
+                    {INDUSTRY_OPTIONS.map((industry) => (
+                      <option key={industry} value={industry}>
+                        {industry}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
