@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Star,
@@ -102,6 +102,10 @@ export default function SocialReviewHub({
   const [likedReviews, setLikedReviews] = useState<Set<string>>(new Set())
   const [savedReviews, setSavedReviews] = useState<Set<string>>(new Set())
 
+  // Client-only random values to avoid hydration mismatch
+  const [followerCount, setFollowerCount] = useState(0)
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({})
+
   // Review submission state
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [rating, setRating] = useState(0)
@@ -116,6 +120,19 @@ export default function SocialReviewHub({
   // Double-tap to like state
   const [showLikeAnimation, setShowLikeAnimation] = useState<string | null>(null)
   const [lastTap, setLastTap] = useState<{ id: string; time: number }>({ id: '', time: 0 })
+
+  // Set random counts on client-side only to avoid hydration issues
+  useEffect(() => {
+    // Set follower count
+    setFollowerCount(Math.floor(Math.random() * 5000 + 10000))
+
+    // Set like counts for each review
+    const counts: Record<string, number> = {}
+    reviews.forEach((review) => {
+      counts[review.id] = Math.floor(Math.random() * 200 + 50)
+    })
+    setLikeCounts(counts)
+  }, [reviews])
 
   const avgRating = useMemo(() => {
     if (reviews.length === 0) return 0
@@ -282,7 +299,7 @@ export default function SocialReviewHub({
                 <div className="text-sm text-gray-400">reviews</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{Math.floor(Math.random() * 5000 + 10000)}</div>
+                <div className="text-2xl font-bold">{followerCount}</div>
                 <div className="text-sm text-gray-400">followers</div>
               </div>
               <div className="text-center">
@@ -583,7 +600,7 @@ export default function SocialReviewHub({
 
                   {/* Like Count */}
                   <p className="text-sm font-semibold mt-3">
-                    {Math.floor(Math.random() * 200 + 50) + (likedReviews.has(review.id) ? 1 : 0)}{' '}
+                    {(likeCounts[review.id] || 0) + (likedReviews.has(review.id) ? 1 : 0)}{' '}
                     likes
                   </p>
                 </div>

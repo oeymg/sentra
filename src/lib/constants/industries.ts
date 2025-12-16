@@ -31,7 +31,7 @@ export const INDUSTRY_OPTIONS = Object.values(INDUSTRIES)
 export function getDesignVariant(industry: string | null | undefined): 'professional' | 'social' {
   if (!industry) return 'social' // Default to social if no industry
 
-  const professionalIndustries = [
+  const professionalIndustries: string[] = [
     INDUSTRIES.HEALTHCARE,
     INDUSTRIES.PROFESSIONAL_SERVICES,
     INDUSTRIES.REAL_ESTATE,
@@ -40,5 +40,5 @@ export function getDesignVariant(industry: string | null | undefined): 'professi
     INDUSTRIES.CONSTRUCTION,
   ]
 
-  return professionalIndustries.includes(industry as Industry) ? 'professional' : 'social'
+  return professionalIndustries.includes(industry) ? 'professional' : 'social'
 }

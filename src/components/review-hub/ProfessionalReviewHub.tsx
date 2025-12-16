@@ -193,8 +193,13 @@ export default function ProfessionalReviewHub({
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <h1 className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
+            <Link href="/" className="flex items-center gap-2.5">
+              <img
+                src="/sentra_icon.png"
+                alt="Sentra"
+                className="w-8 h-8"
+              />
+              <h1 className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors hidden sm:block" style={{ fontFamily: 'Inter, sans-serif' }}>
                 sentra
               </h1>
             </Link>
@@ -636,7 +641,14 @@ export default function ProfessionalReviewHub({
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-          <p className="text-gray-600 mb-4">Powered by Sentra</p>
+          <div className="flex items-center justify-center gap-2.5 mb-4">
+            <img
+              src="/sentra_icon.png"
+              alt="Sentra"
+              className="w-6 h-6"
+            />
+            <p className="text-gray-600 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>Powered by Sentra</p>
+          </div>
           <Link
             href="/"
             className="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"

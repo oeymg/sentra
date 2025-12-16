@@ -5,7 +5,14 @@ export default function Footer() {
     <footer className="border-t border-black py-20 px-6">
       <div className="max-w-5xl mx-auto flex items-center justify-between">
         <div>
-          <div className="text-3xl font-bold mb-2 text-black">sentra</div>
+          <div className="flex items-center gap-2.5 mb-2">
+            <img
+              src="/sentra_icon.png"
+              alt="Sentra"
+              className="w-8 h-8"
+            />
+            <div className="text-3xl font-bold text-black" style={{ fontFamily: 'Inter, sans-serif' }}>sentra</div>
+          </div>
           <div className="text-sm text-black">© 2025</div>
         </div>
         <div className="flex gap-10 text-sm text-black">
