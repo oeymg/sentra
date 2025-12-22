@@ -63,21 +63,21 @@ export default function BookDemoPage() {
     return (
       <main className="min-h-screen bg-white">
         <Header />
-        <div className="max-w-3xl mx-auto px-6 py-32 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-20 sm:py-24 md:py-32 text-center">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', duration: 0.6 }}
-            className="w-20 h-20 mx-auto mb-8 bg-black rounded-full flex items-center justify-center"
+            className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 sm:mb-8 bg-black rounded-full flex items-center justify-center"
           >
-            <CheckCircle2 className="w-10 h-10 text-white" />
+            <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
           </motion.div>
 
-          <h1 className="text-5xl md:text-6xl font-light mb-6 text-black">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 sm:mb-6 text-black">
             Thanks for reaching out.
           </h1>
 
-          <p className="text-xl text-gray-600 mb-12 font-light">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-8 sm:mb-12 font-light">
             We'll get back to you within 24 hours to schedule your demo.
           </p>
 
@@ -106,16 +106,16 @@ export default function BookDemoPage() {
         }} />
       </div>
 
-      <section className="pt-40 pb-32 px-6 relative">
+      <section className="pt-24 sm:pt-32 md:pt-40 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 relative">
         <div className="max-w-4xl mx-auto">
           {/* Hero */}
-          <div className="text-center mb-20">
-            <h1 className="text-[5rem] md:text-[8rem] leading-[0.85] font-light mb-10 tracking-tighter text-black animate-fadeIn">
+          <div className="text-center mb-12 sm:mb-16 md:mb-20">
+            <h1 className="text-5xl sm:text-6xl md:text-[5rem] lg:text-[8rem] leading-[0.85] font-light mb-6 sm:mb-8 md:mb-10 tracking-tighter text-black animate-fadeIn">
               Book a
               <br />
               <span className="italic font-normal">demo.</span>
             </h1>
-            <p className="text-2xl text-black mb-6 max-w-2xl mx-auto font-light leading-relaxed animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+            <p className="text-lg sm:text-xl md:text-2xl text-black mb-4 sm:mb-6 max-w-2xl mx-auto font-light leading-relaxed animate-fadeIn" style={{ animationDelay: '0.1s' }}>
               See how Sentra can transform your review management.
             </p>
 
@@ -154,7 +154,7 @@ export default function BookDemoPage() {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="John Doe"
-                  className="w-full px-4 py-3 border border-black bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition-all"
+                  className="w-full px-4 py-3.5 sm:py-3 text-base sm:text-sm border border-black bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition-all"
                 />
               </div>
 
@@ -170,7 +170,7 @@ export default function BookDemoPage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="john@company.com"
-                  className="w-full px-4 py-3 border border-black bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition-all"
+                  className="w-full px-4 py-3.5 sm:py-3 text-base sm:text-sm border border-black bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition-all"
                 />
               </div>
 
@@ -186,7 +186,7 @@ export default function BookDemoPage() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="What's your business name and what do you do?"
-                  className="w-full px-4 py-3 border border-black bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition-all resize-none"
+                  className="w-full px-4 py-3.5 sm:py-3 text-base sm:text-sm border border-black bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition-all resize-none"
                 />
               </div>
 
@@ -194,7 +194,7 @@ export default function BookDemoPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-4 bg-black text-white hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all inline-flex items-center justify-center gap-2 font-medium"
+                className="w-full py-3.5 sm:py-4 text-base sm:text-sm bg-black text-white hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all inline-flex items-center justify-center gap-2 font-medium"
               >
                 {submitting ? (
                   <>
@@ -220,9 +220,9 @@ export default function BookDemoPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mt-24 pt-16 border-t border-black"
+            className="mt-12 sm:mt-16 md:mt-24 pt-12 sm:pt-16 border-t border-black"
           >
-            <div className="grid md:grid-cols-3 gap-12">
+            <div className="grid md:grid-cols-3 gap-8 sm:gap-10 md:gap-12">
               {[
                 {
                   title: 'AI-powered responses',

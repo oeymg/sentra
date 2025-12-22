@@ -130,7 +130,7 @@ export default function Home() {
       />
 
       {/* Hero Section with Interactive Elements */}
-      <section className="pt-40 pb-32 px-6 relative">
+      <section className="pt-24 sm:pt-32 md:pt-40 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6 relative">
         {/* Animated background grid */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
           <div className="absolute inset-0 animate-gridMove" style={{
@@ -139,10 +139,10 @@ export default function Home() {
           }} />
         </div>
 
-        <div className="max-w-7xl mx-auto relative grid lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto relative grid lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
           {/* Left: Hero Text */}
           <div>
-            <h1 className="text-[4rem] md:text-[6rem] leading-[0.85] font-light mb-8 tracking-tighter text-black animate-fadeIn">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[8rem] leading-[0.85] font-light mb-6 sm:mb-8 tracking-tighter text-black animate-fadeIn">
               Your reviews.
               <br />
               <span className="italic font-normal bg-gradient-to-r from-black via-gray-600 to-black bg-clip-text text-transparent animate-gradient">
@@ -150,7 +150,7 @@ export default function Home() {
               </span>
             </h1>
 
-            <p className="text-xl text-black mb-10 max-w-xl font-light leading-relaxed animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+            <p className="text-base sm:text-lg md:text-xl text-black mb-8 sm:mb-10 max-w-xl font-light leading-relaxed animate-fadeIn" style={{ animationDelay: '0.1s' }}>
               Stop jumping between platforms. Sentra brings all your reviews together,
               analyses them with AI, and helps you respond—instantly.
             </p>
@@ -290,17 +290,17 @@ export default function Home() {
       </section>
 
       {/* Interactive AI Demo Section */}
-      <section className="py-32 px-6 bg-gradient-to-b from-white to-gray-50 relative">
+      <section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-gradient-to-b from-white to-gray-50 relative">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 sm:mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full mb-6">
               <Zap className="w-4 h-4" />
               <span className="text-sm font-medium">Try it yourself</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-light mb-6 text-black">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 sm:mb-6 text-black">
               AI that <span className="italic font-normal">responds for you</span>
             </h2>
-            <p className="text-xl text-black max-w-2xl mx-auto font-light mb-6">
+            <p className="text-base sm:text-lg md:text-xl text-black max-w-2xl mx-auto font-light mb-4 sm:mb-6">
               Choose your tone, AI drafts the perfect response. Watch it happen in real-time.
             </p>
             <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-orange-100 to-amber-100 border border-orange-200 rounded-full shadow-sm">
@@ -311,12 +311,12 @@ export default function Home() {
 
           {/* Interactive tone selector */}
           <div className="max-w-4xl mx-auto">
-            <div className="flex justify-center gap-4 mb-8">
+            <div className="flex justify-center gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8">
               {(['professional', 'friendly', 'apologetic'] as const).map((tone) => (
                 <button
                   key={tone}
                   onClick={() => setSelectedTone(tone)}
-                  className={`px-8 py-4 rounded-xl font-medium transition-all ${
+                  className={`px-3 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-lg sm:rounded-xl text-xs sm:text-sm md:text-base font-medium transition-all ${
                     selectedTone === tone
                       ? 'bg-black text-white shadow-lg scale-105'
                       : 'bg-white border-2 border-black/10 text-black hover:border-black/30'
@@ -396,17 +396,17 @@ export default function Home() {
       </section>
 
       {/* AI Analysis Demo Section */}
-      <section className="py-32 px-6 bg-gradient-to-b from-gray-50 to-white relative">
+      <section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-gradient-to-b from-gray-50 to-white relative">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 sm:mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full mb-6">
               <TrendingUp className="w-4 h-4" />
               <span className="text-sm font-medium">Powered by AI</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-light mb-6 text-black">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 sm:mb-6 text-black">
               AI that <span className="italic font-normal">understands your business</span>
             </h2>
-            <p className="text-xl text-black max-w-2xl mx-auto font-light mb-6">
+            <p className="text-base sm:text-lg md:text-xl text-black max-w-2xl mx-auto font-light mb-4 sm:mb-6">
               Analyse hundreds of reviews in seconds. Get actionable insights, spot trends, and discover what really matters to your customers.
             </p>
             <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200 rounded-full shadow-sm">
@@ -556,13 +556,13 @@ export default function Home() {
       </section>
 
       {/* Platform Integration Visual */}
-      <section className="py-32 px-6 border-y border-black/10 relative overflow-hidden">
+      <section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-y border-black/10 relative overflow-hidden">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-light mb-6 text-black">
+          <div className="text-center mb-12 sm:mb-16 md:mb-20">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 sm:mb-6 text-black">
               All platforms. <span className="italic font-normal">One hub.</span>
             </h2>
-            <p className="text-xl text-black max-w-2xl mx-auto font-light mb-6">
+            <p className="text-base sm:text-lg md:text-xl text-black max-w-2xl mx-auto font-light mb-4 sm:mb-6">
               Connect your review sources and watch them flow into Sentra in real-time.
             </p>
             <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-red-100 to-pink-100 border border-red-200 rounded-full shadow-sm">
@@ -635,8 +635,8 @@ export default function Home() {
       </section>
 
       {/* Features with icons */}
-      <section className="py-32 px-6 relative">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 relative">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-12">
           {[
             {
               icon: MessageSquare,
@@ -691,62 +691,62 @@ export default function Home() {
       </section>
 
       {/* Animated stats */}
-      <section ref={statsRef} className="py-32 px-6 bg-black text-white relative overflow-hidden">
+      <section ref={statsRef} className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 bg-black text-white relative overflow-hidden">
         {/* Animated scanline effect */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent animate-scanline" />
         </div>
 
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-16 relative">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 md:gap-16 relative">
           <div className="group cursor-default text-center">
-            <div className="text-7xl font-light mb-3 transition-all duration-300 group-hover:scale-110">
-              91<span className="text-4xl">%</span>
+            <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light mb-2 sm:mb-3 transition-all duration-300 group-hover:scale-110">
+              91<span className="text-2xl sm:text-3xl md:text-4xl">%</span>
             </div>
-            <div className="text-sm uppercase tracking-widest group-hover:tracking-wider transition-all">Trust reviews like friends</div>
+            <div className="text-xs sm:text-sm uppercase tracking-widest group-hover:tracking-wider transition-all">Trust reviews like friends</div>
           </div>
           <div className="group cursor-default text-center">
-            <div className="text-7xl font-light mb-3 transition-all duration-300 group-hover:scale-110">
-              5-9<span className="text-4xl">%</span>
+            <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light mb-2 sm:mb-3 transition-all duration-300 group-hover:scale-110">
+              5-9<span className="text-2xl sm:text-3xl md:text-4xl">%</span>
             </div>
-            <div className="text-sm uppercase tracking-widest group-hover:tracking-wider transition-all">Revenue boost per star</div>
+            <div className="text-xs sm:text-sm uppercase tracking-widest group-hover:tracking-wider transition-all">Revenue boost per star</div>
           </div>
           <div className="group cursor-default text-center">
-            <div className="text-7xl font-light mb-3 transition-all duration-300 group-hover:scale-110">
+            <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light mb-2 sm:mb-3 transition-all duration-300 group-hover:scale-110">
               {counters.platforms}+
             </div>
-            <div className="text-sm uppercase tracking-widest group-hover:tracking-wider transition-all">Platforms supported</div>
+            <div className="text-xs sm:text-sm uppercase tracking-widest group-hover:tracking-wider transition-all">Platforms supported</div>
           </div>
           <div className="group cursor-default text-center">
-            <div className="text-7xl font-light mb-3 transition-all duration-300 group-hover:scale-110">
+            <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light mb-2 sm:mb-3 transition-all duration-300 group-hover:scale-110">
               10
             </div>
-            <div className="text-sm uppercase tracking-widest group-hover:tracking-wider transition-all">Reviews before trust</div>
+            <div className="text-xs sm:text-sm uppercase tracking-widest group-hover:tracking-wider transition-all">Reviews before trust</div>
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="py-40 px-6 relative">
+      <section className="py-20 sm:py-32 md:py-40 px-4 sm:px-6 relative">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-6xl md:text-8xl font-light mb-12 leading-[0.95] tracking-tight text-black">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-light mb-8 sm:mb-12 leading-[0.95] tracking-tight text-black">
             Stop managing reviews.
             <br />
             <span className="italic">Start understanding them.</span>
           </h2>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-8">
             <Link
               href="/auth/signup"
-              className="inline-flex items-center gap-3 text-lg px-12 py-6 bg-black text-white hover:bg-gray-900 transition-all group relative overflow-hidden shadow-2xl"
+              className="inline-flex items-center gap-2 sm:gap-3 text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 bg-black text-white hover:bg-gray-900 transition-all group relative overflow-hidden shadow-2xl w-full sm:w-auto justify-center"
             >
               <span className="relative z-10">Get started free</span>
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform relative z-10" />
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform relative z-10" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             </Link>
 
             <Link
               href="/how-it-works"
-              className="inline-flex items-center gap-2 text-lg px-8 py-6 border-2 border-black/20 text-black hover:border-black/40 transition-all"
+              className="inline-flex items-center gap-2 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-2 border-black/20 text-black hover:border-black/40 transition-all w-full sm:w-auto justify-center"
             >
               <span>See how it works</span>
             </Link>

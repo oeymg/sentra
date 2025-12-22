@@ -207,9 +207,9 @@ export default function ProfessionalReviewHub({
               onClick={() => setShowReviewModal(true)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm"
             >
-              Write a Review
+              Write Review
             </motion.button>
           </div>
         </div>
@@ -217,27 +217,27 @@ export default function ProfessionalReviewHub({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Business Profile Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
-          <div className="flex items-start gap-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
+          <div className="flex items-start gap-4 sm:gap-6">
             {/* Logo */}
             <div className="flex-shrink-0">
               {business.logo_url ? (
                 <img
                   src={business.logo_url}
                   alt={business.name}
-                  className="w-24 h-24 rounded-lg object-cover border-2 border-blue-100"
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-lg object-cover border-2 border-blue-100"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-lg bg-blue-600 flex items-center justify-center text-white text-3xl font-bold">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xl sm:text-2xl md:text-3xl font-bold">
                   {business.name[0]?.toUpperCase()}
                 </div>
               )}
             </div>
 
             {/* Business Info */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">{business.name}</h1>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 truncate">{business.name}</h1>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
                   <Shield className="w-4 h-4" />
                   <span>Verified</span>
@@ -245,7 +245,7 @@ export default function ProfessionalReviewHub({
               </div>
 
               {business.description && (
-                <p className="text-gray-600 mb-4 max-w-3xl leading-relaxed">{business.description}</p>
+                <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 max-w-3xl leading-relaxed">{business.description}</p>
               )}
 
               {business.website && (
@@ -253,7 +253,7 @@ export default function ProfessionalReviewHub({
                   href={business.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm sm:text-base font-medium transition-colors"
                 >
                   <Globe className="w-4 h-4" />
                   <span>Visit Website</span>
@@ -263,34 +263,34 @@ export default function ProfessionalReviewHub({
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 pt-8 border-t border-gray-200">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-200">
             <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-4xl font-bold text-gray-900">{avgRating}</span>
-                <Star className="w-8 h-8 fill-blue-600 text-blue-600" />
+              <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">{avgRating}</span>
+                <Star className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 fill-blue-600 text-blue-600" />
               </div>
-              <p className="text-sm text-gray-600 font-medium">Average Rating</p>
+              <p className="text-xs sm:text-sm text-gray-600 font-medium">Average Rating</p>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <MessageSquare className="w-6 h-6 text-blue-600" />
-                <span className="text-4xl font-bold text-gray-900">{reviews.length + videoReviews.length}</span>
+              <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-600" />
+                <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">{reviews.length + videoReviews.length}</span>
               </div>
-              <p className="text-sm text-gray-600 font-medium">Total Reviews</p>
+              <p className="text-xs sm:text-sm text-gray-600 font-medium">Total Reviews</p>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
-                <span className="text-4xl font-bold text-gray-900">{responseRate}%</span>
+              <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-600" />
+                <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">{responseRate}%</span>
               </div>
-              <p className="text-sm text-gray-600 font-medium">Response Rate</p>
+              <p className="text-xs sm:text-sm text-gray-600 font-medium">Response Rate</p>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Clock className="w-6 h-6 text-blue-600" />
-                <span className="text-4xl font-bold text-gray-900">&lt;24h</span>
+              <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-600" />
+                <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">&lt;24h</span>
               </div>
-              <p className="text-sm text-gray-600 font-medium">Response Time</p>
+              <p className="text-xs sm:text-sm text-gray-600 font-medium">Response Time</p>
             </div>
           </div>
         </div>

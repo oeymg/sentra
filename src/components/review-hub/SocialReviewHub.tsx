@@ -256,15 +256,15 @@ export default function SocialReviewHub({
       </header>
 
       {/* Profile Section - Instagram Style */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex items-start gap-8 mb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="flex items-start gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8">
           {/* Profile Picture */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="relative"
+            className="relative flex-shrink-0"
           >
             {business.logo_url ? (
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-1 bg-black">
+              <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-40 md:h-40 rounded-full border-4 border-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-1 bg-black">
                 <img
                   src={business.logo_url}
                   alt={business.name}
@@ -272,20 +272,20 @@ export default function SocialReviewHub({
                 />
               </div>
             ) : (
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center text-5xl font-bold">
+              <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center text-2xl sm:text-4xl md:text-5xl font-bold">
                 {business.name[0]?.toUpperCase()}
               </div>
             )}
             {/* Verified Badge */}
-            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center border-4 border-black">
-              <Check className="w-5 h-5 text-white" />
+            <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-7 h-7 sm:w-10 sm:h-10 bg-blue-500 rounded-full flex items-center justify-center border-2 sm:border-4 border-black">
+              <Check className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
             </div>
           </motion.div>
 
           {/* Profile Info */}
-          <div className="flex-1">
-            <div className="flex items-center gap-4 mb-4">
-              <h1 className="text-3xl font-bold">{business.name}</h1>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4 flex-wrap">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">{business.name}</h1>
               <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-full border border-pink-500/30">
                 <Award className="w-4 h-4 text-pink-500" />
                 <span className="text-sm font-semibold">Verified</span>
@@ -293,27 +293,27 @@ export default function SocialReviewHub({
             </div>
 
             {/* Stats - Instagram Style */}
-            <div className="flex items-center gap-8 mb-4">
+            <div className="flex items-center gap-4 sm:gap-6 md:gap-8 mb-3 sm:mb-4">
               <div className="text-center">
-                <div className="text-2xl font-bold">{reviews.length + videoReviews.length}</div>
-                <div className="text-sm text-gray-400">reviews</div>
+                <div className="text-lg sm:text-xl md:text-2xl font-bold">{reviews.length + videoReviews.length}</div>
+                <div className="text-xs sm:text-sm text-gray-400">reviews</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{followerCount}</div>
-                <div className="text-sm text-gray-400">followers</div>
+                <div className="text-lg sm:text-xl md:text-2xl font-bold">{followerCount}</div>
+                <div className="text-xs sm:text-sm text-gray-400">followers</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold flex items-center gap-1">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold flex items-center gap-1">
                   {avgRating}
-                  <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
+                  <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-500 text-yellow-500" />
                 </div>
-                <div className="text-sm text-gray-400">rating</div>
+                <div className="text-xs sm:text-sm text-gray-400">rating</div>
               </div>
             </div>
 
             {/* Bio */}
             {business.description && (
-              <p className="text-gray-300 mb-4 max-w-2xl">{business.description}</p>
+              <p className="text-sm sm:text-base text-gray-300 mb-3 sm:mb-4 max-w-2xl">{business.description}</p>
             )}
 
             {/* Website Link */}
@@ -322,27 +322,27 @@ export default function SocialReviewHub({
                 href={business.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors mb-4"
+                className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors mb-3 sm:mb-4"
               >
                 <Globe className="w-4 h-4" />
-                <span className="text-sm font-medium">Visit Website</span>
+                <span className="text-xs sm:text-sm font-medium">Visit Website</span>
               </a>
             )}
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <motion.button
                 onClick={() => setShowReviewModal(true)}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex-1 max-w-xs px-6 py-2.5 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg font-semibold text-sm"
+                className="flex-1 max-w-xs px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg font-semibold text-xs sm:text-sm"
               >
                 Leave a Review
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-2.5 bg-gray-800 hover:bg-gray-700 rounded-lg font-semibold text-sm transition-colors"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-800 hover:bg-gray-700 rounded-lg font-semibold text-xs sm:text-sm transition-colors"
               >
                 Share
               </motion.button>
