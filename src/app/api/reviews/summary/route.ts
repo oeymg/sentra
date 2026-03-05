@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       .join('\n\n')
 
     const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       messages: [
         {
@@ -97,8 +97,9 @@ Format your response as JSON:
       throw new Error('Unexpected response type from AI')
     }
 
-    // Parse AI response
-    const aiResponse = JSON.parse(content.text)
+    // Parse AI response (strip markdown fences if present)
+    const jsonText = content.text.replace(/```(?:json)?\s*([\s\S]*?)```/, '$1').trim()
+    const aiResponse = JSON.parse(jsonText)
 
     return NextResponse.json({
       summary: aiResponse.summary,

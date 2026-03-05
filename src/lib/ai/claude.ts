@@ -6,7 +6,12 @@ const anthropic = new Anthropic({
 })
 
 // Using latest Haiku model for cost-effective analysis
-const CLAUDE_MODEL = 'claude-3-5-haiku-20241022'
+const CLAUDE_MODEL = 'claude-haiku-4-5-20251001'
+
+function extractJSON(text: string): string {
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+  return fenced ? fenced[1].trim() : text.trim()
+}
 
 export interface ReviewAnalysis {
   sentiment: 'positive' | 'neutral' | 'negative'
@@ -90,7 +95,7 @@ Respond ONLY with valid JSON, no additional text.`
 
     const content = message.content[0]
     if (content.type === 'text') {
-      const analysis = JSON.parse(content.text)
+      const analysis = JSON.parse(extractJSON(content.text))
       return analysis
     }
 
@@ -328,7 +333,7 @@ Respond ONLY with valid JSON, no additional text.`
 
     const content = message.content[0]
     if (content.type === 'text') {
-      const analysis = JSON.parse(content.text)
+      const analysis = JSON.parse(extractJSON(content.text))
       return analysis
     }
 

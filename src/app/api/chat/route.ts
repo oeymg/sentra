@@ -141,7 +141,7 @@ Be conversational, helpful, and data-driven. Use specific examples from the revi
 
     // Stream response from Claude
     const stream = await anthropic.messages.stream({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2000,
       system: systemContext,
       messages,
