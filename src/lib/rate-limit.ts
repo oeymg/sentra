@@ -107,7 +107,18 @@ export async function checkRateLimit(
   const identifier = getRateLimitIdentifier(request, userId)
   const limiter = rateLimiters[type]
 
-  return await limiter.limit(identifier)
+  try {
+    return await limiter.limit(identifier)
+  } catch {
+    // Redis unreachable — fail open to avoid blocking all AI requests
+    return {
+      success: true,
+      limit: Number.MAX_SAFE_INTEGER,
+      remaining: Number.MAX_SAFE_INTEGER,
+      reset: Date.now() + 1000,
+      pending: Promise.resolve(),
+    }
+  }
 }
 
 /**
