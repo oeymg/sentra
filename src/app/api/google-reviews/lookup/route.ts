@@ -41,7 +41,11 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      throw new Error(`Places API error (${response.status}): ${errorText}`)
+      console.error('Places API non-OK response:', response.status, errorText)
+      return NextResponse.json(
+        { error: `Google Places API error (${response.status})`, details: errorText },
+        { status: 502 }
+      )
     }
 
     const data = (await response.json()) as PlacesSearchResponse
@@ -59,7 +63,8 @@ export async function POST(request: NextRequest) {
       userRatingCount: place.userRatingCount ?? null,
     })
   } catch (error) {
-    console.error('Places lookup failed', error)
-    return NextResponse.json({ error: 'Failed to look up Place ID.' }, { status: 500 })
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Places lookup failed', message)
+    return NextResponse.json({ error: 'Failed to look up Place ID.', details: message }, { status: 500 })
   }
 }
