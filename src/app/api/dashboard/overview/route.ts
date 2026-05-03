@@ -135,6 +135,13 @@ export async function GET(request: NextRequest) {
           medianHours: null,
           sameDayPercent: 0,
         },
+        survey: {
+          qrScans: 0,
+          surveySubmissions: 0,
+          conversionRate: 0,
+          starBreakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0, private: 0 },
+          recentSurveyReviews: [],
+        },
       })
     }
 
@@ -296,6 +303,44 @@ export async function GET(request: NextRequest) {
       ? Math.round((responseDiffs.filter((diff) => diff <= 24 * 60 * 60 * 1000).length / responseDiffs.length) * 100)
       : 0
 
+    // Survey stats — scoped to this calendar month
+    const monthStart = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1)).toISOString()
+
+    const [{ count: qrScansCount }, { data: surveyRows }] = await Promise.all([
+      supabase
+        .from('qr_scans')
+        .select('id', { count: 'exact', head: true })
+        .in('business_id', businessIds)
+        .gte('scanned_at', monthStart),
+      supabase
+        .from('survey_submissions')
+        .select('rating, generated_review, submitted_at, created_at')
+        .in('business_id', businessIds)
+        .not('submitted_at', 'is', null)
+        .gte('submitted_at', monthStart)
+        .order('submitted_at', { ascending: false }),
+    ])
+
+    const qrScans = qrScansCount ?? 0
+    const surveySubmissions = surveyRows?.length ?? 0
+    const conversionRate = qrScans > 0 ? Math.round((surveySubmissions / qrScans) * 100) : 0
+
+    const starBreakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0, private: 0 }
+    surveyRows?.forEach((row) => {
+      const r = row.rating as number
+      if (r >= 4) {
+        starBreakdown[r as 4 | 5] = (starBreakdown[r as 4 | 5] ?? 0) + 1
+      } else {
+        starBreakdown.private += 1
+      }
+    })
+
+    const recentSurveyReviews = (surveyRows ?? []).slice(0, 5).map((row) => ({
+      reviewText: row.generated_review,
+      rating: row.rating,
+      submittedAt: row.submitted_at,
+    }))
+
     return NextResponse.json({
       stats: {
         businessCount: businessIds.length,
@@ -315,6 +360,13 @@ export async function GET(request: NextRequest) {
       responseTime: {
         medianHours,
         sameDayPercent,
+      },
+      survey: {
+        qrScans,
+        surveySubmissions,
+        conversionRate,
+        starBreakdown,
+        recentSurveyReviews,
       },
     })
   } catch (error) {
@@ -350,6 +402,13 @@ export async function GET(request: NextRequest) {
       responseTime: {
         medianHours: null,
         sameDayPercent: 0,
+      },
+      survey: {
+        qrScans: 0,
+        surveySubmissions: 0,
+        conversionRate: 0,
+        starBreakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0, private: 0 },
+        recentSurveyReviews: [],
       },
       _error: errorMessage, // Include error details for debugging
     })

@@ -1,308 +1,483 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { Building2, MapPin, Globe, Briefcase, ArrowRight, Check, Sparkles, Zap, Building } from 'lucide-react'
-import { INDUSTRY_OPTIONS } from '@/lib/constants/industries'
+import { ArrowRight, ArrowLeft, Search, CheckCircle2, Star, Loader2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface BusinessSetupFormProps {
   user: User
   planTier: 'free' | 'pro' | 'enterprise'
 }
 
+const TRADE_TYPES = [
+  'Plumbing',
+  'Electrical',
+  'HVAC & Air Con',
+  'Building & Construction',
+  'Painting',
+  'Landscaping',
+  'Cleaning',
+  'Healthcare',
+  'Automotive',
+  'Hospitality',
+  'Retail',
+  'Other',
+]
+
+function toSlug(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+type PlaceResult = {
+  placeId: string
+  displayName: string
+  formattedAddress: string
+  rating: number | null
+  userRatingCount: number | null
+}
+
 export default function BusinessSetupForm({ user, planTier }: BusinessSetupFormProps) {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    businessName: '',
-    industry: '',
-    website: '',
-    location: '',
-  })
+  const [error, setError] = useState('')
+
+  // Step 1 fields
+  const [businessName, setBusinessName] = useState('')
+  const [trade, setTrade] = useState('')
+  const [location, setLocation] = useState('')
+
+  // Step 2 fields
+  const [phone, setPhone] = useState('')
+  const [website, setWebsite] = useState('')
+  const [placeResult, setPlaceResult] = useState<PlaceResult | null>(null)
+  const [placeSearching, setPlaceSearching] = useState(false)
+  const [placeError, setPlaceError] = useState('')
+  const [placeConfirmed, setPlaceConfirmed] = useState(false)
+
   const router = useRouter()
   const supabase = createClient()
 
-  const planDetails = {
-    free: { name: 'Free', icon: Sparkles, color: 'text-gray-600' },
-    pro: { name: 'Pro', icon: Zap, color: 'text-blue-600' },
-    enterprise: { name: 'Enterprise', icon: Building, color: 'text-purple-600' },
-  }
+  const slug = useMemo(() => toSlug(businessName), [businessName])
 
-  const currentPlan = planDetails[planTier]
-  const PlanIcon = currentPlan.icon
+  // Auto-search Google Business when step 2 loads
+  useEffect(() => {
+    if (step !== 2 || placeResult || placeSearching) return
+    if (!businessName.trim() || !location.trim()) return
+    searchGoogleBusiness()
+  }, [step])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const searchGoogleBusiness = async () => {
+    setPlaceSearching(true)
+    setPlaceError('')
+    setPlaceResult(null)
+    setPlaceConfirmed(false)
 
     try {
-      // Ensure profile exists before creating business
-      const { data: profile, error: profileError } = await supabase
+      const res = await fetch('/api/google-reviews/lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: businessName.trim(), location: location.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setPlaceError(data.error || 'No listing found. You can skip this step.')
+      } else {
+        setPlaceResult(data)
+      }
+    } catch {
+      setPlaceError('Could not reach Google. You can skip this step.')
+    } finally {
+      setPlaceSearching(false)
+    }
+  }
+
+  const handleSubmit = async () => {
+    if (!businessName.trim()) return
+    setLoading(true)
+    setError('')
+
+    try {
+      const { error: profileError } = await supabase
         .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single()
+        .upsert({
+          id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.full_name || null,
+        }, { onConflict: 'id', ignoreDuplicates: true })
 
-      if (profileError || !profile) {
-        // Create profile if it doesn't exist
-        const { error: createProfileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            email: user.email || '',
-            full_name: user.user_metadata?.full_name || null,
-          })
-
-        if (createProfileError && createProfileError.code !== '23505') {
-          throw new Error(`Failed to create profile: ${createProfileError.message}`)
-        }
+      if (profileError && profileError.code !== '23505') {
+        throw new Error(`Profile error: ${profileError.message}`)
       }
 
-      // Generate slug from business name
-      let slug = formData.businessName
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '')
-
-      // Fallback to a unique slug if empty
-      if (!slug) {
-        slug = `business-${Date.now()}`
-      }
-
-      // Calculate trial end date for Pro plan (14 days from now)
-      const trialEndsAt = planTier === 'pro'
+      const baseSlug = slug || `business-${Date.now()}`
+      const trialEndsAt = planTier === 'pro' || planTier === 'free'
         ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
         : null
 
-      // Create the business with plan tier
-      const { data: business, error } = await supabase
+      const normaliseWebsite = (url: string) => {
+        if (!url) return null
+        return url.startsWith('http') ? url : `https://${url}`
+      }
+
+      const businessPayload = {
+        user_id: user.id,
+        name: businessName.trim(),
+        slug: baseSlug,
+        industry: trade || 'Home Services',
+        address: location || null,
+        description: location ? `Based in ${location}` : null,
+        phone: phone.trim() || null,
+        website: normaliseWebsite(website.trim()),
+        google_place_id: placeConfirmed && placeResult ? placeResult.placeId : null,
+        plan_tier: 'pro',
+        subscription_status: 'trial',
+        trial_ends_at: trialEndsAt,
+        plan_started_at: new Date().toISOString(),
+      }
+
+      const { error: bizError } = await supabase
         .from('businesses')
-        .insert({
-          user_id: user.id,
-          name: formData.businessName,
-          slug,
-          industry: formData.industry,
-          website: formData.website || null,
-          address: formData.location || null,
-          description: formData.location ? `Located in ${formData.location}` : null,
-          plan_tier: planTier,
-          subscription_status: planTier === 'pro' ? 'trial' : 'active',
-          trial_ends_at: trialEndsAt,
-          plan_started_at: new Date().toISOString(),
-        })
-        .select()
-        .single()
+        .insert(businessPayload)
 
-      if (error) {
-        // If slug already exists, retry with a unique suffix
-        if (error.code === '23505') {
-          const uniqueSlug = `${slug}-${Date.now()}`
-          const { data: retryBusiness, error: retryError } = await supabase
+      if (bizError) {
+        if (bizError.code === '23505') {
+          const { error: retryError } = await supabase
             .from('businesses')
-            .insert({
-              user_id: user.id,
-              name: formData.businessName,
-              slug: uniqueSlug,
-              industry: formData.industry,
-              website: formData.website || null,
-              address: formData.location || null,
-              description: formData.location ? `Located in ${formData.location}` : null,
-              plan_tier: planTier,
-              subscription_status: planTier === 'pro' ? 'trial' : 'active',
-              trial_ends_at: trialEndsAt,
-              plan_started_at: new Date().toISOString(),
-            })
-            .select()
-            .single()
-
+            .insert({ ...businessPayload, slug: `${baseSlug}-${Date.now()}` })
           if (retryError) throw retryError
         } else {
-          throw error
+          throw bizError
         }
       }
 
-      // Redirect to dashboard
       router.push('/dashboard')
       router.refresh()
-    } catch (error: any) {
-      console.error('Error creating business:', error)
-      alert(`Failed to create business: ${error.message || 'Please try again.'}`)
+    } catch (err: any) {
+      console.error('Setup error:', err)
+      setError(err.message || 'Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
+  const step1Valid = businessName.trim().length > 0
+
+  const slideVariants = {
+    enter: (dir: number) => ({ opacity: 0, x: dir * 40 }),
+    center: { opacity: 1, x: 0 },
+    exit: (dir: number) => ({ opacity: 0, x: dir * -40 }),
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white p-4">
-      <div className="w-full max-w-2xl">
-        {/* Plan Badge */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-full mb-4">
-            <PlanIcon className={`w-4 h-4 ${currentPlan.color}`} />
-            <span className="text-sm font-medium text-gray-900">
-              {currentPlan.name} Plan Selected
-            </span>
-            {planTier === 'pro' && (
-              <span className="text-xs text-gray-600">• 14-day free trial</span>
-            )}
-          </div>
-          <h1 className="text-4xl font-light mb-2 text-black">
-            Set up your business
-          </h1>
-          <p className="text-gray-600">
-            Let's get your business profile ready
-          </p>
-        </div>
+    <div className="min-h-screen bg-white flex flex-col relative">
+      <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
+        backgroundImage: 'linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)',
+        backgroundSize: '60px 60px',
+      }} />
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 md:p-12">
-          {/* Progress indicator */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step >= 1
-                  ? 'bg-black text-white'
-                  : 'bg-gray-200 text-gray-600'
-              }`}>
-                {step > 1 ? <Check className="w-5 h-5" /> : '1'}
-              </div>
-              <div className={`w-16 h-1 ${
-                step >= 2 ? 'bg-black' : 'bg-gray-200'
-              }`} />
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step >= 2
-                  ? 'bg-black text-white'
-                  : 'bg-gray-200 text-gray-600'
-              }`}>
-                2
-              </div>
-            </div>
+      <div className="flex-1 flex flex-col justify-center px-6 py-20 relative">
+        <div className="max-w-xl mx-auto w-full">
+
+          <Link href="/" className="text-sm text-gray-400 hover:text-black transition-colors mb-16 inline-block">
+            ← Sentra
+          </Link>
+
+          {/* Step indicator */}
+          <div className="flex gap-1.5 mb-12 w-24">
+            {[1, 2].map(s => (
+              <motion.div
+                key={s}
+                animate={{ backgroundColor: s <= step ? '#000' : '#e5e7eb' }}
+                className="h-1 flex-1 rounded-full"
+                transition={{ duration: 0.3 }}
+              />
+            ))}
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {step === 1 && (
-              <div className="space-y-6">
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-2">
-                    <Building2 className="w-4 h-4" />
-                    Business Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.businessName}
-                    onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent text-black"
-                    placeholder="Acme Restaurant"
-                    required
-                  />
-                </div>
+          <AnimatePresence mode="wait" custom={step === 1 ? -1 : 1}>
+            {step === 1 ? (
+              <motion.div
+                key="step1"
+                custom={-1}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              >
+                <h1 className="text-[3.5rem] md:text-[5rem] leading-[0.88] font-light tracking-tighter text-black mb-4">
+                  Set up your
+                  <br />
+                  <span className="italic font-normal">review page.</span>
+                </h1>
+                <p className="text-xl text-gray-500 font-light mb-14">
+                  Takes 60 seconds. You'll be collecting reviews today.
+                </p>
 
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-2">
-                    <Briefcase className="w-4 h-4" />
-                    Industry
-                  </label>
-                  <select
-                    value={formData.industry}
-                    onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent text-black"
-                    required
-                  >
-                    <option value="">Select industry</option>
-                    {INDUSTRY_OPTIONS.map((industry) => (
-                      <option key={industry} value={industry}>
-                        {industry}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  disabled={!formData.businessName || !formData.industry}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                >
-                  Continue
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-6">
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-2">
-                    <Globe className="w-4 h-4" />
-                    Website (optional)
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent text-black"
-                    placeholder="https://example.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-2">
-                    <MapPin className="w-4 h-4" />
-                    Location (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent text-black"
-                    placeholder="Sydney, NSW"
-                  />
-                </div>
-
-                {/* Trial Info for Pro */}
-                {planTier === 'pro' && (
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <Zap className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="text-sm font-medium text-blue-900 mb-1">
-                          14-Day Pro Trial
-                        </h4>
-                        <p className="text-sm text-blue-700">
-                          Your trial starts now. No credit card required. You'll be notified before it ends.
-                        </p>
-                      </div>
-                    </div>
+                {error && (
+                  <div className="mb-8 px-4 py-3 bg-red-50 border border-red-200 text-red-600 text-sm">
+                    {error}
                   </div>
                 )}
 
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setStep(1)}
-                    className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    {loading ? 'Creating...' : 'Complete Setup'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </form>
-        </div>
+                <div className="space-y-12">
+                  {/* Business name */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">
+                      Business name
+                    </label>
+                    <input
+                      type="text"
+                      value={businessName}
+                      onChange={(e) => setBusinessName(e.target.value)}
+                      className="w-full text-2xl md:text-3xl font-light border-b-2 border-gray-200 focus:border-black outline-none py-3 bg-transparent text-black transition-colors placeholder:text-gray-300"
+                      placeholder="Jake's Plumbing"
+                      autoFocus
+                    />
+                    {slug && (
+                      <p className="mt-3 text-xs text-gray-400 font-mono">
+                        usesentra.com/review/<span className="text-black">{slug}</span>
+                      </p>
+                    )}
+                  </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-600">
-            {planTier === 'pro' && 'Start your free trial now. Upgrade to continue after 14 days.'}
-            {planTier === 'free' && 'You can upgrade to Pro anytime from your dashboard.'}
-          </p>
+                  {/* Trade type */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">
+                      Type of work
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {TRADE_TYPES.map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setTrade(t === trade ? '' : t)}
+                          className={`px-4 py-2 text-sm font-light border transition-all ${
+                            trade === t
+                              ? 'bg-black text-white border-black'
+                              : 'bg-white text-gray-600 border-gray-200 hover:border-black hover:text-black'
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">
+                      Suburb or city{' '}
+                      <span className="normal-case tracking-normal text-gray-300 ml-1">optional</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className="w-full text-2xl md:text-3xl font-light border-b-2 border-gray-200 focus:border-black outline-none py-3 bg-transparent text-black transition-colors placeholder:text-gray-300"
+                      placeholder="Brisbane, QLD"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setStep(2)}
+                      disabled={!step1Valid}
+                      className="inline-flex items-center gap-3 px-10 py-5 bg-black text-white hover:bg-gray-900 transition-all disabled:opacity-40 disabled:cursor-not-allowed group text-lg font-light"
+                    >
+                      Continue
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="step2"
+                custom={1}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              >
+                <h1 className="text-[3.5rem] md:text-[5rem] leading-[0.88] font-light tracking-tighter text-black mb-4">
+                  A bit more
+                  <br />
+                  <span className="italic font-normal">about you.</span>
+                </h1>
+                <p className="text-xl text-gray-500 font-light mb-14">
+                  Helps personalise your review page and notifications.
+                </p>
+
+                {error && (
+                  <div className="mb-8 px-4 py-3 bg-red-50 border border-red-200 text-red-600 text-sm">
+                    {error}
+                  </div>
+                )}
+
+                <div className="space-y-12">
+                  {/* Phone */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">
+                      Phone number{' '}
+                      <span className="normal-case tracking-normal text-gray-300 ml-1">optional</span>
+                    </label>
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full text-2xl md:text-3xl font-light border-b-2 border-gray-200 focus:border-black outline-none py-3 bg-transparent text-black transition-colors placeholder:text-gray-300"
+                      placeholder="0412 345 678"
+                      autoFocus
+                    />
+                    <p className="mt-2 text-xs text-gray-400">Used to notify you of private feedback</p>
+                  </div>
+
+                  {/* Website */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">
+                      Website{' '}
+                      <span className="normal-case tracking-normal text-gray-300 ml-1">optional</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      className="w-full text-2xl md:text-3xl font-light border-b-2 border-gray-200 focus:border-black outline-none py-3 bg-transparent text-black transition-colors placeholder:text-gray-300"
+                      placeholder="jakesplumbing.com.au"
+                    />
+                  </div>
+
+                  {/* Google Business lookup */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">
+                      Google Business listing
+                    </label>
+
+                    {placeSearching && (
+                      <div className="flex items-center gap-3 text-sm text-gray-500 py-4">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Searching Google for <span className="font-medium text-black">{businessName}</span>…
+                      </div>
+                    )}
+
+                    {!placeSearching && placeResult && !placeConfirmed && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="border border-gray-200 rounded-2xl p-5 space-y-4"
+                      >
+                        <div>
+                          <p className="font-medium text-gray-900">{placeResult.displayName}</p>
+                          <p className="text-sm text-gray-500 mt-0.5">{placeResult.formattedAddress}</p>
+                          {placeResult.rating && (
+                            <div className="flex items-center gap-1.5 mt-2">
+                              <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                              <span className="text-sm text-gray-600">{placeResult.rating} · {placeResult.userRatingCount?.toLocaleString()} reviews on Google</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setPlaceConfirmed(true)}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-sm rounded-xl font-medium hover:bg-gray-800 transition-colors"
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                            That's us
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setPlaceResult(null); setPlaceError('Not the right listing? You can skip this for now.') }}
+                            className="px-5 py-2.5 border border-gray-200 text-sm rounded-xl text-gray-600 hover:bg-gray-50 transition-colors"
+                          >
+                            Not us
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {!placeSearching && placeConfirmed && placeResult && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.97 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-3 py-3 text-sm text-gray-700"
+                      >
+                        <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+                        <span>Google Business linked — reviews will post directly from the survey.</span>
+                      </motion.div>
+                    )}
+
+                    {!placeSearching && placeError && !placeResult && (
+                      <div className="space-y-3">
+                        <p className="text-sm text-gray-400">{placeError}</p>
+                        {location.trim() && (
+                          <button
+                            type="button"
+                            onClick={searchGoogleBusiness}
+                            className="flex items-center gap-2 text-sm text-black hover:opacity-60 transition-opacity"
+                          >
+                            <Search className="w-4 h-4" />
+                            Try again
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {!placeSearching && !placeResult && !placeError && !placeConfirmed && location.trim() && (
+                      <button
+                        type="button"
+                        onClick={searchGoogleBusiness}
+                        className="flex items-center gap-2 text-sm text-black hover:opacity-60 transition-opacity"
+                      >
+                        <Search className="w-4 h-4" />
+                        Find my Google listing
+                      </button>
+                    )}
+
+                    {!location.trim() && (
+                      <p className="text-sm text-gray-400">Add a location in step 1 to enable automatic lookup.</p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-4 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="flex items-center gap-2 text-sm text-gray-400 hover:text-black transition-colors"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Back
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={loading}
+                      className="inline-flex items-center gap-3 px-10 py-5 bg-black text-white hover:bg-gray-900 transition-all disabled:opacity-40 disabled:cursor-not-allowed group text-lg font-light"
+                    >
+                      {loading ? 'Setting up…' : 'Get my QR code'}
+                      {!loading && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                    </button>
+                  </div>
+
+                  <p className="text-sm text-gray-400 -mt-6">
+                    14-day free trial. No credit card required.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
         </div>
       </div>
     </div>

@@ -281,13 +281,12 @@ export default function PlatformsPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {platforms
               .filter((platform) =>
-                ['google', 'reddit', 'yelp', 'trustpilot', 'facebook', 'tripadvisor'].includes(platform.slug)
+                ['google', 'reddit', 'tripadvisor'].includes(platform.slug)
               )
               .map((platform) => {
                 // Reddit and TripAdvisor are always "connected" via Claude AI scraping
                 const isConnected = ['reddit', 'tripadvisor'].includes(platform.slug) ? true : selectedConnectionIds.has(platform.id)
                 const connection = connections.find((c) => c.platformId === platform.id)
-                const isComingSoon = ['trustpilot', 'facebook'].includes(platform.slug)
 
                 return (
                   <motion.div
@@ -297,8 +296,6 @@ export default function PlatformsPage() {
                     className={`border rounded-2xl p-6 shadow-sm ${
                       isConnected
                         ? 'border-black bg-black text-white'
-                        : isComingSoon
-                        ? 'border-gray-200 bg-gray-50 text-black opacity-75'
                         : 'border-gray-200 bg-white text-black'
                     }`}
                   >
@@ -307,11 +304,6 @@ export default function PlatformsPage() {
                       {isConnected && (
                         <span className="flex items-center gap-1 text-xs uppercase tracking-widest">
                           <Check className="w-3 h-3" /> Connected
-                        </span>
-                      )}
-                      {!isConnected && isComingSoon && (
-                        <span className="text-xs uppercase tracking-widest text-gray-500">
-                          Coming Soon
                         </span>
                       )}
                     </div>
@@ -334,10 +326,6 @@ export default function PlatformsPage() {
                             Disconnect
                           </button>
                         )
-                      ) : isComingSoon ? (
-                        <span className="px-4 py-2 text-sm text-gray-400 italic">
-                          Not available yet
-                        </span>
                       ) : (
                         <button
                           onClick={() => openModal(platform.id)}
@@ -367,7 +355,7 @@ export default function PlatformsPage() {
             <InfoCard
               icon={<PlugZap className="w-4 h-4" />}
               title="Coming soon"
-              description="Native OAuth flows for Google, Yelp, and Facebook will simplify authentication even further."
+              description="Native OAuth flows for Google will simplify authentication even further."
             />
           </div>
         </div>
@@ -448,9 +436,6 @@ function platformIcon(slug: string) {
   const mapping: Record<string, string> = {
     google: '🔍',
     reddit: '🤖',
-    yelp: '🍽️',
-    facebook: '📘',
-    trustpilot: '⭐',
     tripadvisor: '🧭',
   }
   return mapping[slug] ?? '💬'

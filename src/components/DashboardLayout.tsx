@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { LayoutDashboard, Star, Link2, TrendingUp, Menu, X, RefreshCw, Mail } from 'lucide-react'
+import { LayoutDashboard, Star, Package, TrendingUp, Menu, X, RefreshCw, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { BusinessInsight } from '@/lib/ai/claude'
 import { useBusinessContext } from '@/contexts/BusinessContext'
@@ -14,7 +14,6 @@ import { BusinessSelector } from '@/components/dashboard/BusinessSelector'
 import { SidebarNav } from '@/components/dashboard/sidebar/SidebarNav'
 import { SidebarInsights } from '@/components/dashboard/sidebar/SidebarInsights'
 import { SidebarQuickStats } from '@/components/dashboard/sidebar/SidebarQuickStats'
-import { SidebarPlanCard } from '@/components/dashboard/sidebar/SidebarPlanCard'
 import { SidebarUserPanel } from '@/components/dashboard/sidebar/SidebarUserPanel'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -183,7 +182,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard/reviews', icon: Star, label: 'Reviews' },
     { href: '/dashboard/campaigns', icon: Mail, label: 'Campaigns' },
     { href: '/dashboard/analytics', icon: TrendingUp, label: 'Analytics' },
-    { href: '/dashboard/platforms', icon: Link2, label: 'Platforms' },
+    { href: '/dashboard/assets', icon: Package, label: 'Assets' },
   ]
 
   return (
@@ -266,7 +265,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <SidebarQuickStats stats={quickStats} loading={statsLoading} />
             </nav>
 
-            <SidebarPlanCard />
             <SidebarUserPanel user={user} pathname={pathname} onSignOut={handleSignOut} />
           </aside>
 

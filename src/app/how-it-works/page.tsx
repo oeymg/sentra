@@ -1,66 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, ArrowLeft, MessageSquare, Star, TrendingUp } from 'lucide-react'
+import { ArrowRight, ArrowLeft, QrCode, MessageSquare, Star, ShieldCheck } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  CartesianGrid,
-  XAxis,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts'
-
-const trendData = [
-  { month: 'Jun', reviews: 38 },
-  { month: 'Jul', reviews: 42 },
-  { month: 'Aug', reviews: 55 },
-  { month: 'Sep', reviews: 61 },
-  { month: 'Oct', reviews: 78 },
-  { month: 'Nov', reviews: 96 },
-]
-
-const sentimentData = [
-  { name: 'Positive', value: 72, color: '#16a34a' },
-  { name: 'Neutral', value: 18, color: '#facc15' },
-  { name: 'Negative', value: 10, color: '#dc2626' },
-]
-
-const recentReviews = [
-  {
-    id: '1',
-    platform: 'Google',
-    rating: 5,
-    text: 'Team went above and beyond to keep us in the loop. We love our new build!',
-    time: '2 hours ago',
-  },
-  {
-    id: '2',
-    platform: 'Facebook',
-    rating: 4,
-    text: 'Great result overall, would have loved faster handover but communication was solid.',
-    time: '1 day ago',
-  },
-  {
-    id: '3',
-    platform: 'Google',
-    rating: 5,
-    text: 'Process felt effortless. Highly recommend!',
-    time: '3 days ago',
-  },
-]
-
-const quickStats = [
-  { label: 'Connected Platforms', value: '5', helper: 'Google, Yelp, Facebook, Trustpilot, Tripadvisor', icon: MessageSquare },
-  { label: 'Average Rating', value: '4.8', helper: 'Last 90 days', icon: Star },
-  { label: 'AI Responses', value: '132', helper: 'Personalized replies sent', icon: TrendingUp },
-  { label: 'Time Saved', value: '21h', helper: 'Weekly average', icon: ArrowRight },
-]
 
 export default function HowItWorks() {
   return (
@@ -69,26 +12,23 @@ export default function HowItWorks() {
 
       {/* Hero */}
       <section className="pt-40 pb-32 px-6 relative overflow-hidden">
-        {/* Animated background grid */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
-          <div className="absolute inset-0 animate-gridMove" style={{
-            backgroundImage: 'linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)',
-            backgroundSize: '60px 60px'
-          }} />
-        </div>
+        <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{
+          backgroundImage: 'linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)',
+          backgroundSize: '60px 60px'
+        }} />
 
         <div className="max-w-5xl mx-auto relative">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm mb-8 hover:opacity-60 transition-opacity animate-fadeIn">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm mb-8 hover:opacity-60 transition-opacity">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Link>
-          <h1 className="text-[5rem] md:text-[8rem] leading-[0.85] font-light mb-10 tracking-tighter text-black animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+          <h1 className="text-[5rem] md:text-[8rem] leading-[0.85] font-light mb-10 tracking-tighter text-black">
             How it
             <br />
             <span className="italic font-normal">works.</span>
           </h1>
-          <p className="text-2xl text-black mb-16 max-w-2xl font-light leading-relaxed animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-            From chaos to clarity in three steps.
+          <p className="text-2xl text-gray-600 mb-6 max-w-2xl font-light leading-relaxed">
+            From job completion to a live Google review — in under a minute.
           </p>
         </div>
       </section>
@@ -96,234 +36,170 @@ export default function HowItWorks() {
       {/* Steps */}
       <section className="py-32 px-6 border-t border-black">
         <div className="max-w-5xl mx-auto space-y-32">
+
           {/* Step 1 */}
           <div className="group">
-            <div className="text-8xl font-light text-black mb-8 transition-all duration-500 group-hover:scale-110 group-hover:text-gray-400">01</div>
-            <h2 className="text-5xl font-light mb-8 text-black group-hover:translate-x-2 transition-transform duration-300">Connect your platforms</h2>
-            <p className="text-2xl text-black max-w-3xl font-light leading-relaxed mb-12">
-              Link your Google Business, Yelp, Trustpilot, Facebook, TripAdvisor, and 15+ other review platforms.
-              One-click OAuth—no manual data entry, no API keys to manage.
+            <div className="text-8xl font-light text-black/20 mb-8 group-hover:text-black/50 transition-colors">01</div>
+            <h2 className="text-5xl font-light mb-8 text-black">You give them a QR code</h2>
+            <p className="text-2xl text-gray-500 max-w-3xl font-light leading-relaxed mb-12">
+              Sentra generates a unique QR code for your business. Put it on your business card, a small counter stand, or a leave-behind card after the job.
+              Customers scan it right then — while the experience is still fresh.
             </p>
-            <div className="bg-gray-50 p-12 space-y-4">
-              <div className="text-sm uppercase tracking-widest text-black mb-6">Supported Platforms</div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-black font-light">
-                <div>Google Business</div>
-                <div>Yelp</div>
-                <div>Trustpilot</div>
-                <div>Facebook</div>
-                <div>TripAdvisor</div>
-                <div>G2</div>
-                <div>Capterra</div>
-                <div>Product Hunt</div>
-                <div>Amazon</div>
-                <div>App Store</div>
-                <div>Google Play</div>
-                <div>Zillow</div>
-                <div>OpenTable</div>
-                <div>Booking.com</div>
-                <div>Airbnb</div>
-                <div>+ 5 more</div>
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-12 flex flex-col md:flex-row items-center gap-10">
+              <div className="w-32 h-32 bg-black rounded-2xl flex items-center justify-center shrink-0">
+                <QrCode className="w-16 h-16 text-white" />
+              </div>
+              <div className="space-y-4 text-black font-light text-lg">
+                <p>→ Business card with your QR printed on the back</p>
+                <p>→ Counter display for your reception area</p>
+                <p>→ Each QR links directly to your review page at <span className="font-medium">usesentra.com/review/your-name</span></p>
               </div>
             </div>
           </div>
 
           {/* Step 2 */}
           <div className="group">
-            <div className="text-8xl font-light text-black mb-8 transition-all duration-500 group-hover:scale-110 group-hover:text-gray-400">02</div>
-            <h2 className="text-5xl font-light mb-8 text-black group-hover:translate-x-2 transition-transform duration-300">AI analyzes everything</h2>
-            <p className="text-2xl text-black max-w-3xl font-light leading-relaxed mb-12">
-              Claude reads every review, extracts sentiment, identifies trends, and flags issues that need your attention.
-              No spreadsheets, no manual sorting—just instant insights.
+            <div className="text-8xl font-light text-black/20 mb-8 group-hover:text-black/50 transition-colors">02</div>
+            <h2 className="text-5xl font-light mb-8 text-black">They answer 3 quick questions</h2>
+            <p className="text-2xl text-gray-500 max-w-3xl font-light leading-relaxed mb-12">
+              The survey is designed to take under 30 seconds. Dropdowns and multiple-choice — no typing required.
+              Customers can add their own words too, which makes the final review even more personal.
             </p>
-            <div className="bg-black text-white p-12 space-y-6">
-              <div className="text-sm uppercase tracking-widest mb-6">What you get</div>
-              <div className="space-y-4 font-light text-xl">
-                <div>→ Sentiment analysis (positive, negative, neutral)</div>
-                <div>→ Keyword extraction and trending topics</div>
-                <div>→ Priority flagging for urgent responses</div>
-                <div>→ Customer satisfaction scores over time</div>
-                <div>→ Competitor comparison insights</div>
+            <div className="bg-black text-white rounded-2xl p-12 space-y-8">
+              <div className="text-sm uppercase tracking-widest text-white/40 mb-6">The 3 questions</div>
+              <div className="space-y-6 font-light text-xl">
+                <div className="flex items-start gap-4">
+                  <span className="text-white/30 w-8 shrink-0">1.</span>
+                  <div>
+                    <p className="text-white mb-2">What service did we help you with?</p>
+                    <p className="text-white/40 text-base">Dropdown: AC Repair / Plumbing / Electrical / Painting / Other…</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <span className="text-white/30 w-8 shrink-0">2.</span>
+                  <div>
+                    <p className="text-white mb-2">How was the response speed, quality and pricing?</p>
+                    <p className="text-white/40 text-base">Multiple choice buttons — one tap per question</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <span className="text-white/30 w-8 shrink-0">3.</span>
+                  <div>
+                    <p className="text-white mb-2">Anything else you'd like to add?</p>
+                    <p className="text-white/40 text-base">Optional short text — 200 chars max</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Step 3 */}
           <div className="group">
-            <div className="text-8xl font-light text-black mb-8 transition-all duration-500 group-hover:scale-110 group-hover:text-gray-400">03</div>
-            <h2 className="text-5xl font-light mb-8 text-black group-hover:translate-x-2 transition-transform duration-300">Respond in seconds</h2>
-            <p className="text-2xl text-black max-w-3xl font-light leading-relaxed mb-12">
-              AI drafts personalized responses in your brand voice. Choose your tone—professional, friendly, apologetic—
-              edit if needed, and publish directly to the platform. All without leaving Sentra.
+            <div className="text-8xl font-light text-black/20 mb-8 group-hover:text-black/50 transition-colors">03</div>
+            <h2 className="text-5xl font-light mb-8 text-black">AI writes the review</h2>
+            <p className="text-2xl text-gray-500 max-w-3xl font-light leading-relaxed mb-12">
+              Their answers are turned into a genuine, first-person Google review — around 100 words, specific to the service they received.
+              No generic filler. No robotic phrasing.
             </p>
-            <div className="border border-black p-12 space-y-8">
-              <div className="space-y-4">
-                <div className="text-sm uppercase tracking-widest text-black">Example: 5-star review</div>
-                <div className="text-xl font-light text-black italic">
-                  "Great service, fast delivery, love the product!"
+            <div className="border border-black rounded-2xl p-12 space-y-8">
+              <div>
+                <div className="text-sm uppercase tracking-widest text-gray-400 mb-4">Customer answered</div>
+                <div className="space-y-2 text-gray-600 font-light">
+                  <p>Service: AC Repair &nbsp;·&nbsp; Speed: Same day &nbsp;·&nbsp; Quality: Excellent &nbsp;·&nbsp; Pricing: Very fair</p>
+                  <p className="italic">"Cleaned up after themselves too"</p>
                 </div>
               </div>
-              <div className="space-y-4">
-                <div className="text-sm uppercase tracking-widest text-black">AI-generated response (Professional)</div>
-                <div className="text-xl font-light text-black">
-                  "Thank you so much for your kind words! We're thrilled to hear you're enjoying the product.
-                  Your feedback means the world to our team."
+              <div className="h-px bg-gray-200" />
+              <div>
+                <div className="text-sm uppercase tracking-widest text-gray-400 mb-4">AI-generated review</div>
+                <p className="text-xl font-light text-black leading-relaxed">
+                  "My AC stopped working on one of the hottest days of the year. I called in the morning and they had someone out the same afternoon. The technician was thorough, explained what the issue was, and had it running within an hour. The price was really fair — better than the other quotes I got. They also cleaned up before leaving, which I appreciated. Would definitely use them again."
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 4 */}
+          <div className="group">
+            <div className="text-8xl font-light text-black/20 mb-8 group-hover:text-black/50 transition-colors">04</div>
+            <h2 className="text-5xl font-light mb-8 text-black">They post it. Or it stays private.</h2>
+            <p className="text-2xl text-gray-500 max-w-3xl font-light leading-relaxed mb-12">
+              4 and 5 star experiences get sent to Google — the review text is copied to their clipboard and Google opens automatically.
+              3 stars and under come straight to you, privately. You get to fix it before it becomes a public problem.
+            </p>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="border border-black rounded-2xl p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                  <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                  <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                  <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                  <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                </div>
+                <p className="font-light text-gray-700 mb-5">4–5 stars: customer sees the review, clicks "Post to Google" and it's live.</p>
+                <div className="inline-block px-4 py-2 bg-black text-white text-sm rounded-lg">
+                  Post to Google →
                 </div>
               </div>
-              <div className="space-y-4">
-                <div className="text-sm uppercase tracking-widest text-black">AI-generated response (Friendly)</div>
-                <div className="text-xl font-light text-black">
-                  "You just made our day! 🎉 So happy you're loving it. Thanks for taking the time to share!"
+              <div className="border border-red-200 bg-red-50 rounded-2xl p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <Star className="w-6 h-6 fill-red-400 text-red-400" />
+                  <Star className="w-6 h-6 fill-red-400 text-red-400" />
+                  <Star className="w-6 h-6 text-gray-200" />
+                  <Star className="w-6 h-6 text-gray-200" />
+                  <Star className="w-6 h-6 text-gray-200" />
+                </div>
+                <p className="font-light text-gray-600 mb-5">1–3 stars: feedback goes directly to you. Customer sees "Thank you, we'll be in touch."</p>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-red-500" />
+                  <span className="text-sm text-red-600 font-medium">Sent to you privately</span>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </section>
 
-      {/* Demo Dashboard Section */}
+      {/* Dashboard preview */}
       <section className="py-32 px-6 border-t border-black">
         <div className="max-w-5xl mx-auto">
-          <div className="mb-16">
-            <p className="text-xs uppercase tracking-[0.4em] text-black mb-3">Product preview</p>
-            <h2 className="text-5xl font-light text-black mb-4">See the dashboard in action</h2>
-            <p className="text-xl font-light text-black max-w-3xl">
-              This live preview shows exactly what Sentra looks like once you connect your review platforms.
-              Every metric and chart below mirrors the real dashboard your team will use.
-            </p>
-          </div>
-
-          {/* Quick stats */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {quickStats.map((stat) => {
-              const Icon = stat.icon
-              return (
-                <div key={stat.label} className="border border-black/10 rounded-2xl p-6 shadow-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs uppercase tracking-[0.4em] text-gray-500">{stat.label}</p>
-                    <span className="p-2 rounded-full bg-black text-white">
-                      <Icon className="w-4 h-4" />
-                    </span>
-                  </div>
-                  <p className="text-4xl font-light text-black">{stat.value}</p>
-                  <p className="text-sm text-gray-500 mt-2">{stat.helper}</p>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Chart + sentiment */}
-          <div className="grid lg:grid-cols-[2fr,1fr] gap-6 mb-12">
-            <div className="border border-black rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.4em] text-gray-500">Review volume</p>
-                  <p className="text-2xl font-light text-black">Last 6 months</p>
-                </div>
-                <span className="text-xs px-3 py-1 rounded-full bg-green-50 text-green-600 uppercase tracking-widest">
-                  +28% vs previous period
-                </span>
+          <p className="text-xs uppercase tracking-[0.4em] text-gray-400 mb-4">Your dashboard</p>
+          <h2 className="text-5xl font-light text-black mb-8 tracking-tight">Track everything.</h2>
+          <p className="text-xl text-gray-500 font-light leading-relaxed mb-16 max-w-2xl">
+            See QR scans, review submissions and conversion rate — updated in real time.
+            Know which jobs are generating reviews and which aren't.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { label: 'QR Scans', value: '45', sub: 'This month' },
+              { label: 'Reviews Submitted', value: '12', sub: 'Posted to Google' },
+              { label: 'Conversion Rate', value: '27%', sub: 'Scans → reviews' },
+            ].map((stat) => (
+              <div key={stat.label} className="border border-gray-200 rounded-2xl p-8">
+                <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">{stat.label}</p>
+                <p className="text-5xl font-light text-black mb-1">{stat.value}</p>
+                <p className="text-sm text-gray-400">{stat.sub}</p>
               </div>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trendData} margin={{ left: -10, right: 10 }}>
-                    <defs>
-                      <linearGradient id="trend" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#000" stopOpacity={0.25} />
-                        <stop offset="95%" stopColor="#000" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
-                    <XAxis dataKey="month" stroke="#a1a1aa" />
-                    <Tooltip contentStyle={{ borderRadius: 12, borderColor: '#e4e4e7' }} />
-                    <Area type="monotone" dataKey="reviews" stroke="#000" strokeWidth={2} fill="url(#trend)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="border border-black rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
-              <p className="text-xs uppercase tracking-[0.4em] text-gray-500 mb-4">Sentiment mix</p>
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={sentimentData} innerRadius={70} outerRadius={100} paddingAngle={4} dataKey="value">
-                      {sentimentData.map((entry) => (
-                        <Cell key={entry.name} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-3 gap-3 mt-6 w-full text-center text-sm">
-                {sentimentData.map((slice) => (
-                  <div key={slice.name}>
-                    <p className="text-xs uppercase tracking-widest text-gray-500">{slice.name}</p>
-                    <p className="text-lg font-light text-black">{slice.value}%</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Sample reviews */}
-          <div className="border border-black rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-gray-500">Live feed</p>
-                <p className="text-2xl font-light text-black">Recent reviews</p>
-              </div>
-              <Link href="/auth/signup" className="inline-flex items-center gap-2 text-sm text-black hover:underline">
-                Respond with AI
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {recentReviews.map((review) => (
-                <div key={review.id} className="border border-gray-200 rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-black">{review.platform}</span>
-                    <div className="flex items-center gap-1 text-yellow-500">
-                      {Array.from({ length: 5 }).map((_, index) => (
-                        <Star
-                          key={index}
-                          className={`w-4 h-4 ${index < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-gray-700 mb-3">{review.text}</p>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>{review.time}</span>
-                    <button className="inline-flex items-center gap-2 text-black text-xs uppercase tracking-widest">
-                      Reply with AI <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-40 px-6 border-t border-black relative">
-        <div className="max-w-5xl mx-auto relative group/cta">
-          <div className="absolute -inset-4 bg-black/5 rounded-3xl opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500 blur-xl" />
-
-          <div className="relative">
-            <h2 className="text-6xl md:text-8xl font-light mb-12 leading-[0.95] tracking-tight text-black">
-              Ready to try it?
-            </h2>
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center gap-3 text-base px-10 py-5 bg-black text-white hover:bg-gray-900 transition-all group relative overflow-hidden"
-            >
-              <span className="relative z-10">Start free</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-            </Link>
-          </div>
+      <section className="py-40 px-6 border-t border-black">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-6xl md:text-8xl font-light mb-12 leading-[0.95] tracking-tight text-black">
+            Ready to try it?
+          </h2>
+          <Link
+            href="/auth/signup"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-black text-white hover:bg-gray-900 transition-all group"
+          >
+            <span>Start free trial</span>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <p className="text-sm text-gray-400 mt-5">No credit card required.</p>
         </div>
       </section>
 

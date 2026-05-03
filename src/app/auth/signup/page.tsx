@@ -24,18 +24,23 @@ export default function Signup() {
 
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            full_name: fullName,
-          },
+          data: { full_name: fullName },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 
       if (error) throw error
+
+      // When email confirmation is on, Supabase returns a user with an empty
+      // identities array instead of an error if the email is already registered.
+      if (data.user && data.user.identities?.length === 0) {
+        setError('An account with this email already exists.')
+        return
+      }
 
       setSuccess(true)
     } catch (err: any) {

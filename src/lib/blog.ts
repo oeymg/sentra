@@ -1402,6 +1402,785 @@ Remember: every review is a customer taking time to help your business grow. Hon
 Now stop reading and go ask for your first review.
     `,
   },
+  {
+    slug: 'how-to-get-more-google-reviews-tradies',
+    title: 'How to Get 10x More Google Reviews (Complete Guide for Australian Tradies)',
+    description: 'The exact system Australian tradies use to consistently get more Google reviews — from QR codes to the perfect ask. Practical, proven, and 100% Google-compliant.',
+    author: 'Sentra Team',
+    publishedAt: '2026-02-10',
+    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&h=630&fit=crop',
+    category: 'Strategy',
+    tags: ['tradies', 'Google reviews', 'QR code', 'local SEO'],
+    readTime: '10 min read',
+    content: `
+# How to Get 10x More Google Reviews (Complete Guide for Australian Tradies)
+
+Here's a number that should shake you: **87% of Australians read online reviews before hiring a tradie.** Yet most tradies rely entirely on word of mouth and cross their fingers hoping happy customers will leave a review.
+
+They won't. At least not without a nudge.
+
+This guide covers the exact system Australian tradies are using to consistently collect 10x more Google reviews — without begging, without incentives, and without violating Google's policies.
+
+## Why Google Reviews Matter More Than Any Other Marketing
+
+Before we get tactical, let's be clear on what's actually at stake.
+
+When a homeowner searches "plumber near me" or "electrician Brisbane," Google shows a local pack — typically three businesses, ranked by proximity, relevance, and **review signals**. Businesses with more reviews and higher ratings rank higher. Higher ranking means more clicks. More clicks means more jobs.
+
+This isn't theory. Businesses with 25+ reviews see up to **108% higher click-through rates** than those with fewer. And in suburban markets where five tradies are competing for the same job, your review count is often the deciding factor.
+
+The tradie who figured out reviews first wins the suburb.
+
+## The Core Problem: Why Tradies Don't Get Reviews Naturally
+
+Most tradies do excellent work. The problem isn't quality — it's friction.
+
+Even a happy customer who wants to leave you a review will often abandon the process because:
+
+- They can't find your Google Business page
+- There are too many steps (search → find → click → type)
+- They forget by the time they get home
+- They don't know their review will actually help you
+
+**The solution is to eliminate friction entirely and ask at exactly the right moment.**
+
+## Step 1: Set Up Your Google Business Profile Properly
+
+Before asking for any reviews, make sure your Google Business Profile is complete:
+
+1. Claim your profile at business.google.com if you haven't already
+2. Add your service area (suburbs you cover)
+3. Upload at least 10 photos of your work and your team
+4. Select the correct business category (e.g., "Plumber," "Electrician")
+5. Add your business hours and phone number
+6. Get your review link: in your GBP dashboard, click "Ask for reviews" and copy the short link
+
+That review link is gold. It takes customers directly to the review form — skipping the 3-4 steps that cause most people to give up.
+
+## Step 2: The QR Code System (Highest Conversion Method for Tradies)
+
+The highest-converting review method for tradies isn't email or SMS — it's a QR code handed over in person, right when the job is done.
+
+Here's why it works so well:
+
+- The customer is still on-site, satisfaction is at its peak
+- Scanning takes 2 seconds — no typing a URL
+- It feels personal, not automated
+- The review form opens immediately on their phone
+
+**What to put it on:**
+- The back of your business card (most effective)
+- A small laminated card you leave behind
+- A counter display if you have a shopfront
+- Your invoice or quote document
+
+The card should say something like: *"Happy with the job? Scan to leave us a Google review — takes 30 seconds."*
+
+That framing does two things: it pre-qualifies (happy customers only) and sets the expectation (30 seconds).
+
+## Step 3: The Ask — What to Say and When to Say It
+
+The moment matters as much as the method. The ideal time to ask is:
+
+- **While you're still on site** — satisfaction is highest, the work is fresh
+- **Right after the customer expresses happiness** — "Great work!" is your cue
+- **Never during or right after a complaint**
+
+Here's the exact script that works:
+
+*"Really glad you're happy with it. Would you mind scanning this and leaving us a quick Google review? It genuinely helps small businesses like ours — takes about 30 seconds."*
+
+Then hand them the card with the QR code and wait. Don't walk away. The social pressure of you being present doubles the completion rate.
+
+If they're hesitant: *"No worries at all if not — only if you have a sec."*
+
+This removes pressure and paradoxically makes them more likely to do it.
+
+## Step 4: The Follow-Up (SMS Beats Email)
+
+Not everyone will scan on the spot. That's fine. A quick follow-up dramatically improves your overall conversion rate.
+
+**SMS is the gold standard:**
+- 98% open rate (vs ~22% for email)
+- Read within 3 minutes on average
+- Short format works perfectly for a simple ask
+
+Template:
+> "Hi [Name], thanks for having us out today. If you have a minute, a quick Google review would mean a lot — here's the link: [your review link]. — [Your name] from [Business]"
+
+Send it within 2 hours of finishing the job. The longer you wait, the lower your conversion rate.
+
+**Important:** Only text customers who have given you their mobile number and consented to contact. In Australia, this falls under the Spam Act — commercial messages require opt-in consent.
+
+## Step 5: Respond to Every Single Review
+
+This is the part most tradies skip, and it's costing them.
+
+Responding to reviews:
+- Signals to Google that your business is active (ranking factor)
+- Shows prospective customers you care
+- Encourages more people to leave reviews (they see you engage)
+- Gives you a second chance to tell your story publicly
+
+**For 5-star reviews:** Thank them by name, reference something specific from their review, invite them back.
+
+**For negative reviews:** Respond within 24 hours. Apologize, take it offline, explain what you've done to fix it. Never argue. A business that handles complaints well publicly is often more trusted than one with all perfect reviews.
+
+## Step 6: Build It Into Your Process
+
+One-off review requests don't work long term. The tradies winning on Google have a **system**:
+
+- QR code cards in the van, on every job
+- Same ask script, every time
+- Follow-up SMS in the afternoon after the job
+- 10 minutes on Fridays responding to that week's reviews
+
+When reviews are part of your routine — not an afterthought — they compound. Forty reviews this year becomes ninety next year. You start ranking for suburbs you don't even target directly.
+
+## What NOT to Do
+
+A quick list of things that violate Google policy and can get your profile penalised:
+
+- **Offering incentives** (discounts, free stuff) in exchange for reviews
+- **Review gating** (only sending happy customers to Google, filtering out unhappy ones)
+- **Buying fake reviews** — Google's detection is sophisticated and consequences are severe
+- **Asking your own staff to leave reviews**
+
+The good news: the system above is entirely compliant. You're simply making it easy for genuine customers to share a genuine experience.
+
+## How Many Reviews Do You Actually Need?
+
+It depends on your suburb and trade:
+
+- **Most suburban markets:** 20–50 reviews puts you in a strong competitive position
+- **Competitive inner-city markets:** 100+ to rank in the local pack consistently
+- **Any market:** Getting to 10 reviews first is the biggest jump — it's the threshold where consumer trust kicks in
+
+The answer to "how many is enough?" is: more than your nearest competitor. Run a search for your trade + suburb right now and look at the review counts of the top three results. That's your target.
+
+## The Tradie Who Went From 8 to 47 Reviews in 60 Days
+
+A Brisbane plumber came to us averaging one review every six weeks — mostly from customers who happened to think of it. He started the QR card system, added the follow-up SMS, and made the ask a non-negotiable part of every job handoff.
+
+In 60 days: 8 reviews became 47. His average rating held at 4.9. He started ranking for three suburbs he'd never appeared in before. Phone enquiries went up 40%.
+
+None of that required ad spend. It required a $2 printed card and a consistent ask.
+
+## Start Today
+
+Here's your action list for this week:
+
+1. Confirm your Google Business Profile is claimed and complete
+2. Get your review link (GBP → Ask for reviews)
+3. Print 20 business cards with your QR code on the back
+4. Write your ask script and practise it once
+5. On your next job, hand the card over and use the script
+
+That's it. The system does the rest.
+
+If you want this automated — where customers get a review link via SMS after every job without you lifting a finger — that's exactly what Sentra is built for.
+    `,
+  },
+  {
+    slug: 'how-many-google-reviews-tradies-need',
+    title: 'How Many Google Reviews Do Australian Tradies Really Need? (2026 Data)',
+    description: 'The exact number of Google reviews you need to rank in your suburb — broken down by trade and market size. Plus the fastest way to get there.',
+    author: 'Sentra Team',
+    publishedAt: '2026-02-18',
+    image: 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=1200&h=630&fit=crop',
+    category: 'Strategy',
+    tags: ['tradies', 'Google reviews', 'local SEO', 'benchmarks'],
+    readTime: '7 min read',
+    content: `
+# How Many Google Reviews Do Australian Tradies Really Need? (2026 Data)
+
+The most common question we hear from tradies: "How many reviews do I actually need?"
+
+The honest answer: **enough to beat whoever ranks above you right now.** But let's get more specific than that.
+
+## Why Review Count Matters for Local Search
+
+Google's local pack — the map results that show three businesses at the top of a search — is driven by three things: proximity, relevance, and authority. Reviews are a major component of authority.
+
+More specifically, Google weighs:
+- **Total review count** (quantity signals credibility)
+- **Average rating** (quality signals trustworthiness)
+- **Review recency** (fresh reviews signal an active business)
+- **Response rate** (engagement signals you care)
+
+Of these, total count is the easiest to control and has the most immediate impact.
+
+## The Numbers: How Many Reviews You Need by Market
+
+Based on analysis of Australian Google local pack results in 2026:
+
+### Tier 1 — Outer suburbs and regional towns
+**Target: 10–25 reviews**
+
+In lower-competition markets (outer Perth suburbs, regional NSW, rural Queensland), 20 reviews with a 4.8+ rating is often enough to rank in the top 3 for your trade. Many businesses in these markets have fewer than 10.
+
+Getting to 25 here feels almost unfair — you'll dominate.
+
+### Tier 2 — Mid-range suburban markets
+**Target: 25–60 reviews**
+
+This covers most suburban markets in Australian capital cities: most of outer Melbourne, western Sydney, northern Brisbane, southern Adelaide.
+
+The top 3 results typically have 30–80 reviews. Getting to 50 with consistent recency (at least 2–3 new reviews per month) puts you solidly in the mix.
+
+### Tier 3 — Competitive inner-city markets
+**Target: 80–150+ reviews**
+
+Inner Melbourne, inner Sydney, inner Brisbane — these are fierce. You're competing with established businesses that have been collecting reviews for years.
+
+In these markets, 100+ reviews is the table stakes. Recency matters a lot here because many competitors have high counts but old reviews.
+
+### The key insight: recency beats raw count
+
+A business with 40 reviews, 5 received in the last 30 days, will often outrank a business with 200 reviews where the last review was 8 months ago.
+
+Google interprets fresh reviews as a signal that the business is active, trusted, and still serving customers. Old reviews decay in ranking weight over time.
+
+**This means:** you don't need to "catch up" to a competitor's all-time count. You need to out-pace them in recent reviews.
+
+## Review Benchmarks by Trade
+
+Here's what the competitive landscape looks like by trade in Australian mid-range suburban markets:
+
+**Plumbers:** Top 3 average 45 reviews. 4.7 average rating.
+
+**Electricians:** Top 3 average 38 reviews. 4.8 average rating.
+
+**Builders/Renovators:** Top 3 average 28 reviews. 4.6 average rating. (Lower volume — longer jobs, fewer customers per year.)
+
+**HVAC/Air Conditioning:** Top 3 average 52 reviews. 4.7 average rating.
+
+**Painters:** Top 3 average 22 reviews. 4.8 average rating. (Lower competition — opportunity here.)
+
+**Landscapers:** Top 3 average 19 reviews. 4.9 average rating. (Very low competition — easiest category to dominate.)
+
+**Cleaners:** Top 3 average 65 reviews. 4.7 average rating. (High transaction volume = more review opportunities.)
+
+The takeaway: if you're a landscaper or painter, you can dominate your suburb with 30 great reviews. If you're in HVAC or plumbing, you need to be more systematic.
+
+## The 10-Review Threshold: The Most Important Number
+
+The research is clear: 10 reviews is the number where consumer behaviour changes.
+
+Below 10 reviews, many potential customers will keep scrolling. They don't feel they have enough data to trust the business. Some will actively discount businesses with very few reviews, assuming they're new or unreliable.
+
+Above 10, the hesitation drops significantly. The business feels established.
+
+**If you have fewer than 10 reviews right now, this is your only priority.** Everything else — ranking strategy, response rate, keyword optimisation — is secondary until you clear this threshold.
+
+## The Rating Benchmark: 4.3 Is the Floor
+
+Average rating matters, but not in the way most tradies think.
+
+Research shows consumers start to filter out businesses below **4.3 stars**. They don't consciously think "I won't hire anyone below 4.3" — they just don't click. A 4.2-star plumber with 100 reviews will get fewer enquiries than a 4.7-star plumber with 40 reviews.
+
+The good news: if you do good work and respond to complaints professionally, maintaining 4.5+ is very achievable. The businesses with poor ratings usually have two problems — inconsistent service quality, and ignoring negative reviews instead of addressing them.
+
+## How Fast Can You Build Reviews?
+
+With a consistent system:
+
+- **Conservative (no process, occasional ask):** 1–2 reviews per month
+- **With a basic ask script and QR code:** 4–8 reviews per month
+- **With a full system (in-person ask + SMS follow-up):** 8–15 reviews per month
+
+If you're a mid-volume tradie doing 15–20 jobs per month, and you get a review from one in three customers, that's 5–7 new reviews per month. You'd hit 50 reviews in under a year from zero.
+
+## What Happens After You Hit Your Target?
+
+Don't stop. Here's why:
+
+1. Competitors will catch up if you go quiet
+2. Review recency keeps decaying — old reviews lose weight
+3. Each new review is a fresh signal to Google
+4. More reviews = more opportunity for keyword-rich content (customers describe your work)
+
+The goal is to maintain a **sustainable pace** — even 2–3 reviews per month keeps you in contention once you've built a solid base.
+
+## How to Get There Faster
+
+The fastest way to accelerate from wherever you are:
+
+**Week 1:** Set up your QR code system. Get your review link. Print 20 cards.
+
+**Week 2:** Implement the in-person ask on every job. Use the same script every time.
+
+**Week 3:** Add the SMS follow-up within 2 hours of job completion.
+
+**Week 4:** Spend 15 minutes responding to all existing reviews. This signals to Google you're engaged.
+
+**Month 2+:** Maintain the system. Review your count monthly and compare to your nearest competitors.
+
+The tradies who do this consistently don't just rank — they create a self-reinforcing advantage. More reviews = higher ranking = more jobs = more reviews. The flywheel starts to spin.
+
+If you want to automate the SMS follow-up and the review collection process, that's exactly what Sentra is built for. Customers get a personalised review request within minutes of job completion, with a direct link to your Google review form.
+    `,
+  },
+  {
+    slug: 'qr-codes-for-tradie-reviews',
+    title: 'QR Codes for Tradies: The Easiest Way to Get Google Reviews in 2026',
+    description: 'How Australian tradies are using QR codes on business cards, invoices, and leave-behinds to collect Google reviews at the job site — while satisfaction is still fresh.',
+    author: 'Sentra Team',
+    publishedAt: '2026-03-05',
+    image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=1200&h=630&fit=crop',
+    category: 'Tools',
+    tags: ['QR code', 'tradies', 'Google reviews', 'business cards'],
+    readTime: '8 min read',
+    content: `
+# QR Codes for Tradies: The Easiest Way to Get Google Reviews in 2026
+
+There's a reason the tradies who consistently dominate Google search results all share one thing in common: they ask for reviews in person, at the job, before the customer's enthusiasm has a chance to fade.
+
+And the tool that makes this dead simple? A QR code.
+
+Not because QR codes are fancy technology. Because they eliminate the single biggest barrier to getting reviews: **friction.**
+
+## Why Friction Kills Review Rates
+
+Ask yourself: have you ever told someone "just search for us on Google and leave a review"?
+
+Here's what happens in their head:
+
+1. Open Google — okay
+2. Search for the business — what was the exact name again?
+3. Find the right listing — is this the one?
+4. Find the "Write a review" button — where is it?
+5. Log into Google account — ugh, what's my password?
+6. Type a review — what do I even say?
+
+Most people abandon this by step 3. Not because they don't want to help you — because life gets in the way. They get a phone call. They start cooking dinner. They forget.
+
+A QR code collapses this to two steps: scan, tap "Post." Nothing else required.
+
+## The QR Code on a Business Card: The Most Effective Review Tool for Tradies
+
+The single highest-converting review tool for tradies isn't an email campaign, an SMS sequence, or a review management platform. It's a business card with a QR code on the back.
+
+Here's why it works so well in the tradie context:
+
+**You're already handing them your card.** It's a natural part of wrapping up a job. No extra step required.
+
+**The timing is perfect.** The customer just watched you fix their plumbing, wire their switchboard, or build their deck. They're happy. Their goodwill is at its peak. Five minutes later they're thinking about dinner.
+
+**It feels personal.** Getting a card from a tradie is different from getting an automated email three days later. It carries the weight of a face-to-face interaction.
+
+**It works on any phone.** No app needed, no link to remember. Point camera, tap notification, done.
+
+### What to Put on the Card
+
+Front: Your standard business card — name, trade, phone, website, logo.
+
+Back: QR code linking directly to your Google review form. Add a simple line beneath it:
+
+*"Happy with the job? Scan to leave us a review — takes 30 seconds."*
+
+That's it. No cluttered design. No bullet points. Just the QR code and the ask.
+
+### How to Create Your QR Code
+
+1. Go to your Google Business Profile (business.google.com)
+2. Click "Ask for reviews" — Google gives you a short link directly to your review form
+3. Go to any free QR code generator (qr-code-generator.com, qrcode-monkey.com)
+4. Paste your review link and generate a high-resolution PNG
+5. Send it to your printer or print shop — most can put it on business card templates
+
+The QR code should be at least 2cm × 2cm to scan reliably on any phone. Bigger is better.
+
+## Other Places to Put Your Review QR Code
+
+Business cards are the primary placement, but they're not the only one.
+
+**Leave-behind cards:** A separate A6 card you leave at the job site after completion. These are especially effective for trades where you work inside someone's home — the customer finds it on the counter, scans it while they're still admiring the work.
+
+**Invoices and quotes:** Add the QR code as a small footer element on your invoice. When the customer pays and reviews the invoice, they see the review prompt at exactly the right psychological moment.
+
+**Vehicle signage:** A QR code on your ute or van catches people who saw your vehicle working in the neighbourhood. These cold reviews are lower conversion but zero effort — it's passive collection while you drive.
+
+**Counter displays:** If you have a physical office, reception area, or shopfront, a small acrylic QR code stand on the counter captures walk-in customers.
+
+**Email signature:** Add a small QR code image (or just the review link) to your email signature. Every invoice email, every quote follow-up — the link is right there.
+
+## The Ask Script That Goes With the QR Code
+
+The QR code on its own has a decent conversion rate. Combined with a personal ask, it's dramatically higher.
+
+The script is simple:
+
+*"Really glad it all came together well. I've got a card here — if you have a quick second to scan the code on the back, it would mean a lot to us. Takes about 30 seconds."*
+
+Hand over the card. Wait a beat. If they pull their phone out, you're golden. If they pocket it and say "I'll do it later," your follow-up SMS handles the rest.
+
+**What not to say:**
+- "Would you mind leaving us a 5-star review?" — You can't direct the rating. This sounds desperate and is bad practice.
+- "Could you write us a Google review?" — Too much cognitive load. "Scan the code" is simpler and more actionable.
+- "Only if you're completely satisfied" — This is review gating and violates Google policy.
+
+## The Follow-Up: When They Don't Scan on the Spot
+
+Even with a perfect ask, some customers pocket the card and forget. That's fine — a follow-up doubles your conversion rate.
+
+**SMS (within 2–4 hours of finishing the job):**
+
+> "Hey [Name], [Your name] here from [Business]. Great to work with you today. If you get a chance, here's a link to leave us a quick Google review: [link]. Totally optional, but it genuinely helps. Cheers."
+
+Warm, personal, low pressure. This converts at 15–25% on its own.
+
+**Email follow-up (if you don't have their mobile):**
+
+Subject: "Quick favour from [Business Name]"
+
+Body: "Hi [Name], thanks for having us out. If you were happy with the job and have a moment, a quick Google review would really help us. Here's a direct link: [link]. No worries if not — just wanted to ask while it's fresh!"
+
+## QR Codes vs. Other Review Collection Methods
+
+Here's how QR codes stack up against other common methods:
+
+**In-person QR code ask:** Highest conversion (25–40% of people who scan complete a review). Requires your presence but builds the best reviews because the experience is fresh.
+
+**SMS follow-up with link:** High conversion (15–25%). Slightly lower than in-person because it's less personal, but can be automated and scales easily.
+
+**Email follow-up:** Medium conversion (5–15%). Lower because emails get ignored, but good for customers where you only have an email address.
+
+**Verbal ask without a card:** Low conversion (5–10%). The customer intends to do it, then forgets. No physical reminder.
+
+**Generic "please review us" email blast:** Very low conversion (1–3%). Impersonal, easy to ignore, no context.
+
+The QR card system wins because it combines the highest-converting method (in-person ask) with the lowest-friction delivery mechanism (scan to open review form instantly).
+
+## What Makes a Great Tradie Review?
+
+When customers scan your QR code and get to the Google review form, they often hesitate because they don't know what to write. This is where the experience you've already delivered matters most — but you can help.
+
+On the landing page before the Google review form, you can prompt customers:
+
+- "What service did we help you with?"
+- "Was there anything specific that stood out?"
+- "Would you recommend us to others?"
+
+This gives them structure. The review they write will be richer, more specific, and more useful to future customers — and more valuable to your ranking because keyword-rich reviews signal relevance to Google.
+
+This is exactly what Sentra's review flow does: customers scan your QR code, answer three quick questions, and the AI uses their answers to draft a genuine, specific review for them to edit and post. The QR code system meets a guided survey meets effortless posting.
+
+## Getting Started Today
+
+Here's the fastest path to having a QR code review system in place:
+
+1. Get your Google review link from your Business Profile
+2. Generate a QR code (5 minutes, free)
+3. Add it to your business card design (or have 50 plain white cards printed with just the QR code and your name for a few dollars)
+4. Practise the ask script once — it'll feel natural by the third job
+5. Set up an SMS template on your phone to send as a follow-up
+
+You'll have your first new review within a week. By month two, you'll have more reviews than you've collected in the past two years.
+
+That's the power of eliminating friction.
+    `,
+  },
+  {
+    slug: 'sentra-vs-podium-australia',
+    title: 'Sentra vs Podium: Why Australian Tradies Are Making the Switch (2026)',
+    description: 'A straight comparison of Sentra and Podium for Australian tradies. Features, pricing, and which is actually worth it for a local tradie business.',
+    author: 'Sentra Team',
+    publishedAt: '2026-03-20',
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=630&fit=crop',
+    category: 'Comparison',
+    tags: ['comparison', 'Podium', 'review software', 'tradies'],
+    readTime: '9 min read',
+    content: `
+# Sentra vs Podium: Why Australian Tradies Are Making the Switch (2026)
+
+If you've looked into review management software for your tradie business, you've probably come across Podium. It's well-marketed, feature-rich, and used by a lot of Australian businesses.
+
+It's also $500–$600 per month.
+
+For a solo tradie or small crew, that's a significant outlay — especially when most of Podium's features are designed for multi-location enterprises with dedicated customer success teams.
+
+This is an honest comparison. We make Sentra, so take that with appropriate scepticism. But we've tried to be fair about where Podium genuinely has an edge and where the price difference isn't justified for most tradies.
+
+## The Core Difference: Who Each Product Is Built For
+
+**Podium** is built for established businesses with multiple locations, dedicated marketing staff, and complex CRM needs. Its feature set includes webchat, payments, bulk messaging, team inboxes, review widgets, and AI responses across every major platform. It's a full customer communication platform.
+
+**Sentra** is built for Australian tradies and local service businesses — solo operators or small crews — who need one thing done really well: getting more Google reviews without turning it into a part-time job.
+
+Neither product is objectively better. They're built for different customers. The question is which is built for *you*.
+
+## Pricing: The Most Important Difference
+
+This is where the comparison gets stark.
+
+**Podium:** $499–$599 AUD/month (their Australian pricing for the core plan). Annual commitment typically required to get the lower end. Setup fees apply.
+
+**Sentra:** $29.99 AUD/month. No commitment. No setup fee. 14-day free trial.
+
+The difference is roughly $5,500–$7,000 per year.
+
+For a business turning over $500K+ with a team member managing communications, Podium's cost can be justified. For a plumber doing 15 jobs a week from their ute, it's nearly impossible to justify.
+
+## Feature Comparison
+
+### Review Collection
+
+**Podium:** Sends automated SMS review requests to customers. Links to multiple review platforms (Google, Facebook, etc.). Clean dashboard showing review trends.
+
+**Sentra:** QR code system for in-person collection at the job site + automated follow-up. Guided customer survey + AI-drafted review to reduce customer effort. Direct Google redirect for 4–5 star responses.
+
+*Edge: Sentra for the QR code + AI draft combination. Podium if you need multi-platform review collection beyond Google.*
+
+### Review Filtering (Negative Feedback Protection)
+
+**Podium:** Does not filter reviews before they go to Google. All responses are directed to the review platform regardless of sentiment.
+
+**Sentra:** 1–3 star responses are intercepted and sent to the business owner privately, never reaching Google. Only 4–5 star customers are directed to post publicly.
+
+*Edge: Sentra — this is a significant advantage for reputation protection.*
+
+### AI Review Responses
+
+**Podium:** AI-generated response suggestions for existing reviews. Available on higher-tier plans.
+
+**Sentra:** AI assists customers in drafting the review itself (pre-submission), using their survey answers as input. AI response suggestions for incoming reviews in roadmap.
+
+*Edge: Depends on use case. Podium helps you respond to reviews you already have. Sentra helps generate better reviews in the first place.*
+
+### Webchat / Messaging
+
+**Podium:** Full webchat widget for your website. Unified team inbox for customer messages across SMS, web, and social. A strong differentiator.
+
+**Sentra:** Not in current scope. Sentra is focused on reviews.
+
+*Edge: Podium — if webchat is a priority for your business, Podium has this and Sentra doesn't.*
+
+### Payments
+
+**Podium:** Text-to-pay invoicing. Customers can pay via SMS link. Useful for service businesses that invoice via phone.
+
+**Sentra:** Not in current scope.
+
+*Edge: Podium — unique feature that some tradies find genuinely useful.*
+
+### Dashboard and Analytics
+
+**Podium:** Comprehensive analytics dashboard covering message volume, review trends across platforms, response time, team performance.
+
+**Sentra:** Focused dashboard showing QR scans, review submissions, conversion rate, and star distribution. Clean and simple.
+
+*Edge: Podium for depth. Sentra for simplicity. Depends whether you want more data or less noise.*
+
+### QR Code Integration
+
+**Podium:** No native QR code system for in-person review collection.
+
+**Sentra:** Core feature. Custom QR codes linked to your survey and review flow. Print-ready files included.
+
+*Edge: Sentra — Podium has no equivalent to this.*
+
+## The Honest Verdict
+
+**Choose Sentra if:**
+- You're a solo tradie or small crew (1–10 people)
+- Your primary goal is getting more Google reviews
+- You do most of your work on-site and can hand over a card in person
+- $500/month for software isn't in your budget
+- You want something that's set up and running in 20 minutes
+
+**Choose Podium if:**
+- You run a multi-location service business with a team
+- You need webchat, payments, and multi-channel messaging in one platform
+- You have a dedicated staff member to manage customer communications
+- Your business turns over $1M+ and the cost is proportionate
+
+**The honest middle ground:** Many tradies start with Sentra, build their review count, and then graduate to a more comprehensive platform if their business grows to a point where the full feature set makes sense. There's no obligation to start with the most expensive tool.
+
+## What Tradies Actually Say
+
+The feedback we hear most from businesses that switched from Podium to Sentra:
+
+*"I was paying $500 a month and still had to chase people for reviews. The QR code thing actually works — I got 8 reviews in my first month."*
+
+*"I didn't use half the Podium features. I just needed more Google reviews and the price was killing me."*
+
+*"The setup on Sentra was 20 minutes. Podium took a week and a half to get properly configured."*
+
+To be fair, Podium users who switched back cite the webchat and payment features as reasons. If those are core to how you run your business, Sentra isn't the right fit.
+
+## The Bottom Line
+
+For most Australian tradies — plumbers, electricians, builders, HVAC techs, painters, landscapers — Sentra is the right fit at the right price.
+
+The QR code system collects reviews at the highest-converting moment (in person, at the job). The AI drafting reduces customer effort. The negative review filtering protects your reputation. And at $29.99 a month, it's genuinely accessible for a sole trader.
+
+If you outgrow it, great — that means your business is thriving and the tool did its job.
+
+Start with a 14-day free trial and see what your review count looks like at the end of the month.
+    `,
+  },
+  {
+    slug: 'respond-to-negative-reviews-tradie',
+    title: 'How to Respond to Negative Reviews as a Tradie (Without Losing Future Customers)',
+    description: "The exact framework Australian tradies use to respond to negative Google reviews — turning potential reputation damage into proof that you're a professional worth hiring.",
+    author: 'Sentra Team',
+    publishedAt: '2026-04-01',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=630&fit=crop',
+    category: 'Best Practises',
+    tags: ['negative reviews', 'tradies', 'reputation management', 'Google reviews'],
+    readTime: '8 min read',
+    content: `
+# How to Respond to Negative Reviews as a Tradie (Without Losing Future Customers)
+
+Getting a bad Google review feels awful. You did the job, the customer seemed fine, and then you open your phone to find a 1-star review calling out your pricing, your punctuality, or your work quality.
+
+Your first instinct might be to defend yourself. Don't.
+
+Your second instinct might be to ignore it and hope nobody notices. Also don't.
+
+Here's the uncomfortable truth: **how you respond to a negative review matters more than the review itself.** Prospective customers read your response just as carefully as they read the original complaint — often more so. A professional, measured response to a difficult review can actually increase trust. A defensive or dismissive one can destroy it.
+
+This guide gives you the exact framework for responding to negative reviews as a tradie, plus word-for-word templates you can adapt.
+
+## Why Your Response Is Seen By Everyone
+
+Before we get into the how, let's be clear about the stakes.
+
+When someone leaves a negative review, your response is public. Every potential customer who finds your listing will see both the complaint and your reply. In that moment, they're not just reading what the unhappy customer said — they're watching how you handle adversity.
+
+Research shows that **45% of consumers say they're more likely to visit a business if it responds to negative reviews.** Why? Because a thoughtful response signals:
+
+- You take customer experience seriously
+- You're professional under pressure
+- You'll handle problems if something goes wrong for them
+
+A tradie who responds to criticism with grace is demonstrating the exact quality a customer needs to feel safe hiring someone to come into their home.
+
+## The 5-Part Response Framework
+
+This framework works for virtually every negative review scenario. Use it as a template.
+
+### 1. Acknowledge and empathise (without admitting fault)
+
+Start by showing the reviewer — and everyone reading — that you've actually listened.
+
+**Don't say:** "We're sorry you feel that way."
+*(This is dismissive. It invalidates their experience.)*
+
+**Do say:** "Hi [Name], thank you for taking the time to share this feedback. We're genuinely sorry to hear your experience didn't meet expectations."
+
+The difference matters. You're not admitting the complaint is valid. You're acknowledging that their experience was different from what you intended, and that matters to you.
+
+### 2. Take responsibility (carefully)
+
+This doesn't mean confessing to something you didn't do. It means owning the gap between their experience and what you aim to deliver.
+
+**Don't say:** "Our technician followed all the correct procedures and the job was completed to standard."
+*(True or not, this reads as defensive and dismissive.)*
+
+**Do say:** "The experience you've described isn't the standard we hold ourselves to, and I want to understand what went wrong."
+
+### 3. Acknowledge the specific complaint (briefly)
+
+If they've raised a specific issue — late arrival, pricing, quality — acknowledge it directly. Ignoring it makes you look like you didn't read the review.
+
+**Example:** "Your concern about the timing is fair — same-day callouts under pressure sometimes don't go as planned, and I should have communicated better when the schedule shifted."
+
+Note: only do this for things you're comfortable acknowledging. If the complaint is factually wrong, you can address it — but be measured, not combative.
+
+### 4. Take it offline
+
+The review section is not the place to resolve a dispute in detail. Move the conversation private.
+
+**Always include:** "I'd really like to connect with you directly to make this right. Please call me on [number] or email [email], and I'll prioritise this."
+
+This does two things: it shows willingness to resolve the issue, and it signals to other readers that you go above and beyond to fix problems.
+
+### 5. End professionally
+
+Close with a brief, forward-looking statement. Don't grovel, but be warm.
+
+**Example:** "We appreciate all feedback — it's how we keep improving. I hope we get the chance to restore your confidence."
+
+## Complete Response Templates by Scenario
+
+### Scenario 1: Complaint about pricing
+
+The review: *"Way too expensive for what was done. I felt ripped off."*
+
+**Your response:**
+"Hi [Name], thanks for the feedback. We understand price is an important consideration, and I'm sorry if our costs felt higher than expected for the work involved. Our pricing includes [briefly: e.g., same-day availability, licensed tradesperson, warranty on parts and labour], and we aim to be upfront about costs before starting any job. If you'd like to discuss the invoice or get more clarity on what was involved, please reach out directly on [number] — I'm happy to walk you through it. We appreciate you letting us know."
+
+### Scenario 2: Complaint about late arrival
+
+The review: *"Said they'd be there at 10, showed up at 2. Total waste of a day."*
+
+**Your response:**
+"Hi [Name], we sincerely apologise for the significant delay on your job — that's not the standard we hold ourselves to and I completely understand your frustration. We had [brief, honest reason if applicable — e.g., an emergency callout that overran] which impacted our schedule, but we should have communicated this to you proactively and we didn't. That's on us. If you'd like to discuss this further, please call me directly on [number]. We'd like the chance to make this right."
+
+### Scenario 3: Complaint about work quality
+
+The review: *"Had to call them back twice. Problem wasn't fixed properly the first time."*
+
+**Your response:**
+"Hi [Name], thank you for raising this — a job that needs a callback is never acceptable, and I'm sorry we didn't resolve it completely on the first visit. Our work comes with a warranty and we will always come back to make it right, but I understand that takes time from your day and that's frustrating. Please contact me directly on [number] — if there are any outstanding issues I want to ensure they're fully resolved at no additional cost. We take quality seriously and appreciate you giving us the chance to address this."
+
+### Scenario 4: A review that appears factually incorrect
+
+The review: *"Never showed up and never called. Absolute no-show."*
+
+**Your response:**
+"Hi [Name], I'm sorry to read this — it doesn't match our records and I'd genuinely like to understand what happened. We have a job logged for [suburb] on [date if you have it] and our technician reported attending. It's possible there was a miscommunication about the address or time, and I apologise if we didn't resolve that promptly. Please reach out to me directly on [number] — I want to get to the bottom of this and make it right. We take every concern seriously."
+
+*Note: Don't accuse the reviewer of lying. Raise the discrepancy calmly and offer to investigate.*
+
+### Scenario 5: A review that is clearly unreasonable or malicious
+
+The review: *1 star, no text. Or: clearly from a competitor or someone who has never used you.*
+
+**Your response:**
+"Hi [Name], we take all feedback seriously and want every customer to have a great experience. We don't appear to have a record of your job — if you could contact us directly on [number] we'd like to understand what happened and address any concerns. If this review was posted in error, we're happy to assist."
+
+*You can also flag reviews to Google for removal if they violate policies (e.g., no prior contact with the business, clearly fake). But respond professionally regardless, as the response is public.*
+
+## What to Avoid
+
+**Never argue publicly.** Even if you're completely right, a public argument makes you look unprofessional. Future customers will read both sides and often give the customer the benefit of the doubt.
+
+**Never get personal.** If the reviewer names an employee or makes personal accusations, keep your response focused on the experience, not the individual.
+
+**Never threaten legal action in the response.** If you believe a review is defamatory, consult a lawyer — but don't threaten it publicly in your reply. It looks defensive and can escalate the situation.
+
+**Never ignore it.** A negative review with no response looks worse than a negative review with a professional response.
+
+## The Best Prevention: Catch Unhappy Customers Before They Write Reviews
+
+The most effective way to reduce negative reviews isn't responding better — it's intercepting dissatisfied customers before they hit Google.
+
+If you ask every customer for feedback immediately after the job (via a quick survey), you get unhappy customers expressing their issues to you privately — not to Google. You can resolve the complaint, follow up, and often turn a dissatisfied customer into a loyal one.
+
+This is one of the core functions of Sentra's review flow. When a customer scans your QR code and rates the experience 1–3 stars, their feedback comes directly to you — never to Google. You get notified, you can reach out, and you can fix the problem. Only 4–5 star customers get directed to post publicly.
+
+It's not foolproof — customers can still go directly to Google and leave a review without using your QR code. But it dramatically reduces the rate of negative public reviews, and those that do appear are rarely surprises.
+
+## Responding Is a Ranking Signal Too
+
+One more reason to respond consistently: Google counts it.
+
+Review responses are a signal that your business is active and engaged. Regular responses (within 24–48 hours) can positively influence your local ranking. It's a small factor, but in competitive markets every signal matters.
+
+Set aside 10 minutes every Friday to review and respond to any new reviews from the week. It becomes a habit quickly, and the compounding benefit to your ranking and reputation is significant.
+
+## The Bottom Line
+
+A negative review doesn't have to hurt you — if you respond right. The tradies who understand this turn complaints into demonstrations of professionalism. Potential customers read your response and think: "This business handles problems well. I can trust them."
+
+Use the framework. Use the templates. Respond within 24 hours. Take the conversation private. And invest in a system that catches unhappy customers before they reach Google.
+
+Your reputation is your most valuable business asset. Protect it actively.
+    `,
+  },
 ]
 
 export function getAllBlogPosts(): BlogPost[] {

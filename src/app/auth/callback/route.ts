@@ -19,9 +19,9 @@ export async function GET(request: Request) {
         .eq('user_id', user.id)
         .limit(1)
 
-      // If no businesses exist, redirect to plan selection
+      // New users go straight to business setup — everyone starts on the pro trial
       if (!businesses || businesses.length === 0) {
-        return NextResponse.redirect(new URL('/onboarding/plan-selection', requestUrl.origin))
+        return NextResponse.redirect(new URL('/onboarding/business-setup?plan=pro', requestUrl.origin))
       }
     }
   }

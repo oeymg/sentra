@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
+    "@types/qrcode": "^1.5.6",
     "@types/snoowrap": "^1.16.1"
   }
 }
