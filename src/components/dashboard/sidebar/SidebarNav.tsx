@@ -8,6 +8,7 @@ export type SidebarNavItem = {
   href: string
   icon: LucideIcon
   label: string
+  highlight?: boolean
 }
 
 interface SidebarNavProps {
@@ -41,7 +42,10 @@ export function SidebarNav({ items, pathname }: SidebarNavProps) {
                     />
                   )}
                   <Icon className="w-5 h-5" />
-                  <span className="font-light">{item.label}</span>
+                  <span className={item.highlight && !isActive ? 'font-medium' : 'font-light'}>{item.label}</span>
+                  {item.highlight && !isActive && (
+                    <span className="ml-auto w-2 h-2 rounded-full bg-green-400 shrink-0" />
+                  )}
                 </motion.div>
               </Link>
             </li>

@@ -17,10 +17,20 @@ import {
   Eye,
   BarChart3,
   Calendar,
+  MessageCircle,
+  Phone,
+  Send,
 } from 'lucide-react'
 import Link from 'next/link'
 import { EmptyState } from '@/components/dashboard/EmptyState'
 import { StatsCard } from '@/components/dashboard/StatsCard'
+
+interface ReviewRequest {
+  id: string
+  method: 'whatsapp' | 'sms' | 'email'
+  contact_hint: string
+  sent_at: string
+}
 
 interface Campaign {
   id: string
@@ -40,15 +50,33 @@ interface Campaign {
 export default function CampaignsPage() {
   const router = useRouter()
   const { selectedBusiness } = useBusinessContext()
+  const [tab, setTab] = useState<'campaigns' | 'quick-sends'>('campaigns')
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const [quickSends, setQuickSends] = useState<ReviewRequest[]>([])
   const [loading, setLoading] = useState(true)
+  const [quickSendsLoading, setQuickSendsLoading] = useState(false)
   const [filter, setFilter] = useState<'all' | 'active' | 'scheduled' | 'completed'>('all')
 
   useEffect(() => {
     if (selectedBusiness) {
       loadCampaigns()
+      loadQuickSends()
     }
   }, [selectedBusiness])
+
+  const loadQuickSends = async () => {
+    if (!selectedBusiness) return
+    try {
+      setQuickSendsLoading(true)
+      const res = await fetch(`/api/review-requests?businessId=${selectedBusiness.id}`)
+      const data = await res.json()
+      if (res.ok) setQuickSends(data.requests ?? [])
+    } catch {
+      // ignore
+    } finally {
+      setQuickSendsLoading(false)
+    }
+  }
 
   const loadCampaigns = async () => {
     if (!selectedBusiness) return
@@ -128,21 +156,116 @@ export default function CampaignsPage() {
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-light text-black">Review Campaigns</h1>
-            <p className="text-gray-600 mt-1">
-              Request reviews from customers and track responses
-            </p>
+            <h1 className="text-3xl font-light text-black">Campaigns</h1>
+            <p className="text-gray-600 mt-1">Request reviews from customers and track responses</p>
           </div>
-          <Link
-            href="/dashboard/campaigns/new"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            Create Campaign
-          </Link>
+          {tab === 'campaigns' && (
+            <Link
+              href="/dashboard/campaigns/new"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              <Plus className="w-5 h-5" />
+              Create Campaign
+            </Link>
+          )}
+          {tab === 'quick-sends' && (
+            <Link
+              href="/dashboard/send"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              <Send className="w-4 h-4" />
+              Send Request
+            </Link>
+          )}
         </div>
+
+        {/* Tab toggle */}
+        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-8 w-fit">
+          <button
+            onClick={() => setTab('campaigns')}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+              tab === 'campaigns' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Campaigns
+          </button>
+          <button
+            onClick={() => setTab('quick-sends')}
+            className={`flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+              tab === 'quick-sends' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Quick Sends
+            {quickSends.length > 0 && (
+              <span className="bg-gray-200 text-gray-600 text-xs rounded-full px-1.5 py-0.5 leading-none">
+                {quickSends.length}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Quick Sends tab */}
+        {tab === 'quick-sends' && (
+          quickSendsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : quickSends.length === 0 ? (
+            <EmptyState
+              icon={Send}
+              title="No quick sends yet"
+              description="Use the Send Request page to fire off review links right after a job — they'll appear here."
+              action={{ label: 'Send a request', onClick: () => router.push('/dashboard/send') }}
+            />
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">Method</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">Sent to</th>
+                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">When</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {quickSends.map((req, idx) => {
+                    const MethodIcon = req.method === 'whatsapp' ? MessageCircle : req.method === 'sms' ? Phone : Mail
+                    const methodLabel = req.method === 'whatsapp' ? 'WhatsApp' : req.method === 'sms' ? 'SMS' : 'Email'
+                    const sentAt = new Date(req.sent_at)
+                    const isToday = new Date().toDateString() === sentAt.toDateString()
+                    const timeStr = isToday
+                      ? sentAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      : sentAt.toLocaleDateString([], { day: 'numeric', month: 'short' }) + ' · ' + sentAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+                    return (
+                      <motion.tr
+                        key={req.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.03 }}
+                        className="hover:bg-gray-50"
+                      >
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center gap-2 text-sm text-gray-700">
+                            <MethodIcon className="w-4 h-4 text-gray-400" />
+                            {methodLabel}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-mono text-gray-600">{req.contact_hint}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500">{timeStr}</td>
+                      </motion.tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )
+        )}
+
+        {/* Campaigns tab */}
+        {tab === 'campaigns' && <>
 
         {/* Stats */}
         {campaigns.length > 0 && (
@@ -319,6 +442,9 @@ export default function CampaignsPage() {
             </table>
           </div>
         )}
+
+        </> /* end campaigns tab */}
+
       </div>
     </DashboardLayout>
   )

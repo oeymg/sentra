@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, ChevronLeft, Star, ExternalLink } from 'lucide-react'
+import { getSurveyConfig } from '@/lib/surveyConfig'
+import Link from 'next/link'
 
 type Business = {
   id: string
@@ -34,31 +36,6 @@ type GenerateResult = {
 }
 
 const STEP_COUNT = 4
-
-const SERVICE_OPTIONS = [
-  'Air Conditioning',
-  'Plumbing',
-  'Electrical',
-  'Carpentry / Joinery',
-  'Painting',
-  'Tiling',
-  'Roofing',
-  'General Maintenance',
-  'Other',
-]
-
-const HIGHLIGHT_OPTIONS = [
-  'Arrived on time',
-  'Left the area clean',
-  'Explained the problem clearly',
-  'Fixed it quickly',
-  'Good value for money',
-  'Friendly & professional',
-  'Great quality finish',
-  'Easy to communicate with',
-  'Sorted it in one visit',
-  'Kept us updated throughout',
-]
 
 // ─── Star rating input ────────────────────────────────────────────────────────
 const STAR_LABELS = ['', 'Poor', 'Needs work', 'Okay', 'Good', 'Excellent']
@@ -122,12 +99,15 @@ function StarRatingInput({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function ReviewSurveyPage() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const businessId = params.businessId as string
   const supabase = useMemo(() => createClient(), [])
 
   const [business, setBusiness] = useState<Business | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const config = useMemo(() => getSurveyConfig(business?.industry ?? null), [business?.industry])
 
   const [step, setStep] = useState(1)
   const [dir, setDir] = useState(1)
@@ -141,6 +121,7 @@ export default function ReviewSurveyPage() {
     customerName: '',
     additionalComments: '',
   })
+  const [customServiceType, setCustomServiceType] = useState('')
   const [generating, setGenerating] = useState(false)
   const [result, setResult] = useState<GenerateResult | null>(null)
   const [submitted, setSubmitted] = useState(false)
@@ -170,11 +151,26 @@ export default function ReviewSurveyPage() {
         }
 
         setBusiness(bizData)
-        fetch('/api/qr/scan', {
+
+        // Detect source from ?ref= param
+        const ref = searchParams.get('ref') // 'qr' | 'nfc' | 'link' | null
+        const source = ref === 'qr' || ref === 'nfc' || ref === 'link' ? ref : 'direct'
+
+        // Track page view (all sources)
+        fetch('/api/survey/pageview', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ businessId: bizData.id }),
+          body: JSON.stringify({ businessId: bizData.id, source }),
         }).catch(() => {})
+
+        // Also record in legacy qr_scans table when source is QR
+        if (source === 'qr') {
+          fetch('/api/qr/scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ businessId: bizData.id }),
+          }).catch(() => {})
+        }
       } catch {
         setError('Unable to load this page')
       } finally {
@@ -193,8 +189,12 @@ export default function ReviewSurveyPage() {
     }))
   }
 
+  const resolvedServiceType = answers.serviceType === 'Other'
+    ? customServiceType.trim()
+    : answers.serviceType
+
   const canAdvance = () => {
-    if (step === 1) return answers.serviceType !== ''
+    if (step === 1) return answers.serviceType !== '' && (answers.serviceType !== 'Other' || customServiceType.trim().length > 0)
     if (step === 2) return answers.serviceRating > 0 && answers.qualityRating > 0 && answers.speedRating > 0
     if (step === 3) return answers.jobDescription.trim().length >= 5
     return true
@@ -217,7 +217,8 @@ export default function ReviewSurveyPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           businessId: business.id,
-          serviceType: answers.serviceType,
+          industry: business.industry,
+          serviceType: resolvedServiceType,
           serviceRating: answers.serviceRating,
           qualityRating: answers.qualityRating,
           speedRating: answers.speedRating,
@@ -422,7 +423,7 @@ export default function ReviewSurveyPage() {
               <div className="space-y-4">
                 <p className="font-medium text-gray-900">What service did we help you with?</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {SERVICE_OPTIONS.map((opt) => (
+                  {config.serviceOptions.map((opt) => (
                     <button
                       key={opt}
                       type="button"
@@ -437,6 +438,25 @@ export default function ReviewSurveyPage() {
                     </button>
                   ))}
                 </div>
+                <AnimatePresence>
+                  {answers.serviceType === 'Other' && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <input
+                        type="text"
+                        value={customServiceType}
+                        onChange={e => setCustomServiceType(e.target.value.slice(0, 80))}
+                        placeholder="Describe the service…"
+                        autoFocus
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
 
@@ -444,17 +464,17 @@ export default function ReviewSurveyPage() {
             {step === 2 && (
               <div className="space-y-8">
                 <StarRatingInput
-                  label="Overall service"
+                  label={config.ratingLabels.service}
                   value={answers.serviceRating}
                   onChange={(v) => setAnswers(a => ({ ...a, serviceRating: v }))}
                 />
                 <StarRatingInput
-                  label="Quality of work"
+                  label={config.ratingLabels.quality}
                   value={answers.qualityRating}
                   onChange={(v) => setAnswers(a => ({ ...a, qualityRating: v }))}
                 />
                 <StarRatingInput
-                  label="Response speed"
+                  label={config.ratingLabels.speed}
                   value={answers.speedRating}
                   onChange={(v) => setAnswers(a => ({ ...a, speedRating: v }))}
                 />
@@ -471,7 +491,7 @@ export default function ReviewSurveyPage() {
                     type="text"
                     value={answers.jobDescription}
                     onChange={e => setAnswers(a => ({ ...a, jobDescription: e.target.value.slice(0, 120) }))}
-                    placeholder="e.g. Fixed a burst pipe under the kitchen sink"
+                    placeholder={config.jobPlaceholder}
                     autoFocus
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                   />
@@ -482,7 +502,7 @@ export default function ReviewSurveyPage() {
                   <p className="font-medium text-gray-900">What stood out?</p>
                   <p className="text-sm text-gray-400">Select any that apply.</p>
                   <div className="flex flex-wrap gap-2">
-                    {HIGHLIGHT_OPTIONS.map(h => (
+                    {config.highlights.map(h => (
                       <button
                         key={h}
                         type="button"
@@ -567,6 +587,19 @@ export default function ReviewSurveyPage() {
         {step === 3 && answers.jobDescription.trim().length < 5 && (
           <p className="text-xs text-center text-gray-400 mt-4">Add a brief job description to continue</p>
         )}
+
+        {/* Powered by Sentra */}
+        <div className="mt-12 pt-6 border-t border-gray-100 flex justify-center">
+          <Link
+            href="https://usesentra.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs text-gray-300 hover:text-gray-500 transition-colors"
+          >
+            Powered by
+            <span className="font-medium text-gray-400">Sentra</span>
+          </Link>
+        </div>
       </div>
     </div>
   )

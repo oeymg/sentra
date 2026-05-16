@@ -25,6 +25,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
 /* Custom cursor for interactive elements */
 @media (pointer: fine) {
   body {

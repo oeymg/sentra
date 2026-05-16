@@ -7,7 +7,7 @@ import { useOverview } from '@/hooks/useOverview'
 import { EmptyState } from '@/components/dashboard/EmptyState'
 import { StatsCardSkeleton } from '@/components/dashboard/LoadingSkeleton'
 import { motion } from 'framer-motion'
-import { Link2, QrCode, Star, TrendingUp, Copy, Check, ExternalLink, RefreshCw } from 'lucide-react'
+import { Link2, QrCode, Star, TrendingUp, Copy, Check, ExternalLink, RefreshCw, Send } from 'lucide-react'
 import Link from 'next/link'
 
 type SurveyData = {
@@ -130,6 +130,26 @@ export default function Dashboard() {
               {refreshing ? 'Refreshing…' : 'Refresh'}
             </button>
           </div>
+
+          {/* Send CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+          >
+            <Link
+              href="/dashboard/send"
+              className="flex items-center justify-between gap-4 bg-black text-white rounded-2xl px-6 py-5 hover:bg-gray-900 transition-colors group"
+            >
+              <div>
+                <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Just finished a job?</p>
+                <p className="text-lg font-light">Send the review request now — while they&apos;re still happy.</p>
+              </div>
+              <div className="shrink-0 w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                <Send className="w-5 h-5" />
+              </div>
+            </Link>
+          </motion.div>
 
           {/* This Month stats */}
           <div>

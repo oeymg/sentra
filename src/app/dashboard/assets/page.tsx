@@ -15,23 +15,28 @@ function buildSurveyUrl(slug: string) {
   return `${base}/review/${slug}`
 }
 
+// QR code encodes a ?ref=qr URL so page-view source tracking works
+function buildQRUrl(slug: string) {
+  return `${buildSurveyUrl(slug)}?ref=qr`
+}
+
 // ─── QR Code Card ─────────────────────────────────────────────────────────────
-function QRCodeCard({ surveyUrl }: { surveyUrl: string | null }) {
+function QRCodeCard({ surveyUrl, qrUrl }: { surveyUrl: string | null; qrUrl: string | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    if (!surveyUrl || !canvasRef.current) return
-    QRCode.toCanvas(canvasRef.current, surveyUrl, {
+    if (!qrUrl || !canvasRef.current) return
+    QRCode.toCanvas(canvasRef.current, qrUrl, {
       width: 220,
       margin: 2,
       color: { dark: '#000000', light: '#ffffff' },
     })
-  }, [surveyUrl])
+  }, [qrUrl])
 
   const download = useCallback(async () => {
-    if (!surveyUrl) return
-    const dataUrl = await QRCode.toDataURL(surveyUrl, { width: 1200, margin: 4 })
+    if (!qrUrl) return
+    const dataUrl = await QRCode.toDataURL(qrUrl, { width: 1200, margin: 4 })
     const a = document.createElement('a')
     a.href = dataUrl
     a.download = 'sentra-qr-code.png'
@@ -319,6 +324,7 @@ export default function AssetsPage() {
 
   const slug = selectedBusiness ? (selectedBusiness.slug || selectedBusiness.id) : null
   const surveyUrl = slug ? buildSurveyUrl(slug) : null
+  const qrUrl = slug ? buildQRUrl(slug) : null
   const businessName = selectedBusiness?.name || ''
 
   return (
@@ -341,7 +347,7 @@ export default function AssetsPage() {
           {/* Grid */}
           <div className="grid lg:grid-cols-3 gap-4">
             {/* QR Code — spans 2 cols */}
-            <QRCodeCard surveyUrl={surveyUrl} />
+            <QRCodeCard surveyUrl={surveyUrl} qrUrl={qrUrl} />
 
             {/* Send to Customer */}
             <SendCard surveyUrl={surveyUrl} businessName={businessName} />

@@ -165,18 +165,16 @@ export default function Onboarding() {
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 text-black focus:outline-none focus:border-black transition-colors"
                   >
                     <option value="">Select an industry</option>
-                    <option value="property">Real Estate & Property Development</option>
-                    <option value="construction">Construction & Building</option>
-                    <option value="professional">Professional Services</option>
-                    <option value="home">Home Services</option>
-                    <option value="retail">Retail & E-commerce</option>
-                    <option value="hospitality">Hospitality & Travel</option>
-                    <option value="healthcare">Healthcare</option>
-                    <option value="automotive">Automotive</option>
-                    <option value="beauty">Beauty & Wellness</option>
-                    <option value="education">Education</option>
-                    <option value="technology">Technology</option>
-                    <option value="other">Other</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Hospitality">Hospitality</option>
+                    <option value="Plumbing">Plumbing</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="HVAC & Air Con">HVAC & Air Con</option>
+                    <option value="Building & Construction">Building & Construction</option>
+                    <option value="Painting">Painting</option>
+                    <option value="Landscaping">Landscaping</option>
+                    <option value="Cleaning">Cleaning</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
               </div>

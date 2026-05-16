@@ -14,6 +14,8 @@ interface BusinessSetupFormProps {
 }
 
 const TRADE_TYPES = [
+  'Healthcare',
+  'Hospitality',
   'Plumbing',
   'Electrical',
   'HVAC & Air Con',
@@ -21,10 +23,6 @@ const TRADE_TYPES = [
   'Painting',
   'Landscaping',
   'Cleaning',
-  'Healthcare',
-  'Automotive',
-  'Hospitality',
-  'Retail',
   'Other',
 ]
 
@@ -130,7 +128,7 @@ export default function BusinessSetupForm({ user, planTier }: BusinessSetupFormP
         user_id: user.id,
         name: businessName.trim(),
         slug: baseSlug,
-        industry: trade || 'Home Services',
+        industry: trade || 'Other',
         address: location || null,
         description: location ? `Based in ${location}` : null,
         phone: phone.trim() || null,

@@ -15,6 +15,7 @@ const STAR_LABEL: Record<number, string> = {
 
 async function generateReviewText(
   businessName: string,
+  industry: string,
   serviceType: string,
   serviceRating: number,
   qualityRating: number,
@@ -28,10 +29,11 @@ async function generateReviewText(
     ? `What stood out to the customer: ${highlights.join(', ')}`
     : 'No specific highlights selected'
 
-  const prompt = `You are writing a Google review on behalf of a real customer for an Australian tradie business. Your job is to write it so it sounds exactly like something a regular person would type themselves.
+  const prompt = `You are writing a Google review on behalf of a real customer for an Australian ${industry || 'trade'} business. Your job is to write it so it sounds exactly like something a regular person would type themselves — not AI, not corporate, just a real person.
 
 CUSTOMER CONTEXT
 Business: ${businessName}
+Industry: ${industry || 'general trade'}
 Service type: ${serviceType}
 What was done: ${jobDescription || 'not specified'}
 ${highlightLine}
@@ -45,15 +47,14 @@ Response speed: ${STAR_LABEL[speedRating]} (${speedRating}/5)
 
 RULES
 - Write in first person ("I", "we", "my")
-- 70–120 words — not too short (looks fake), not too long (looks corporate)
-- Reference specific details: mention what was actually done, what stood out, and reflect the ratings honestly
-- Vary your sentence structure — don't start every sentence the same way
-- Sound like a real tradie customer: plain language, conversational, occasionally informal
-- If the ratings are mostly 4–5: warm and positive but grounded
-- If ratings are mixed (some 3s): honest and balanced — not gushing
-- NEVER use: "I highly recommend", "pleasantly surprised", "went above and beyond", "five-star", "10/10"
+- 70–130 words — substantial enough to look real, not so long it reads corporate
+- Use language appropriate for the industry — a plumbing review sounds different to a restaurant review
+- Reference specific details from what was done and what stood out — make it feel personal
+- Vary sentence structure and length — real reviews aren't uniformly written
+- Match the emotional temperature to the ratings: 4–5 stars = warm and positive; any 3s = balanced and measured
+- NEVER use: "I highly recommend", "pleasantly surprised", "went above and beyond", "five-star", "10/10", "exceptional", "outstanding"
 - Do NOT mention star counts in the text
-- Do NOT add a sign-off like "Thanks!" or the reviewer's name at the end
+- Do NOT add a sign-off or the reviewer's name at the end
 - Respond with only the review text, nothing else`
 
   const message = await anthropic.messages.create({
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const {
       businessId,
+      industry,
       serviceType,
       serviceRating,
       qualityRating,
@@ -103,6 +105,7 @@ export async function POST(request: NextRequest) {
 
     const reviewText = await generateReviewText(
       business.name,
+      industry ?? '',
       serviceType,
       serviceRating,
       qualityRating,
